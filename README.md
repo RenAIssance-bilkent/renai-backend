@@ -27,7 +27,7 @@ This repository contains the backend API for Melody Muse, an innovative platform
 ```
 2. Navigate to the cloned repository:
 ```bash
-   git cd renai-backend
+   cd renai-backend
 ```
 3. Restore dependencies:
 ```bash
@@ -40,3 +40,8 @@ This repository contains the backend API for Melody Muse, an innovative platform
     "DatabaseName": "MelodyMuseDb"
   }
 ```
+
+### Architecture
+## UML Class diagram
+![TLDDQzn03BtxLmnxSjiaqAif8KcNqa8F2qb-WEfHlABpOIGv8PJ-zyxEs1kFIVUmW_IUf3TFunjHO9syQte78kPHaCsVngJVftjb2eEPKYg0nog97iXLcJ6LlqIstq6E1VX9ebyU6FhVrqPFXvGy1JLZJF_I_6tckPcs6Kos2fNKrI8633ndikwU4HJjtMl9xLFmG1wN_ArMrJ1PYezStyAZ](https://github.com/RenAIssance-bilkent/renai-backend/assets/33938205/7783e849-92e7-40e4-b731-d0c79fc31bb7)
+
