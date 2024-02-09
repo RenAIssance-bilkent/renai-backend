@@ -49,7 +49,7 @@ This repository contains the backend API for Melody Muse, an innovative platform
 ## API Endpoints
 * POST /api/u/register: Register a new user.
 * POST /api/auth/: Authenticate a user.
-* GET /api/u/[id]: Get user by id.
 * POST /api/tracks/generate: Generate a new track.
-* PUT /api/u: Update user profile.
+* GET /api/u/[id]: Get user by id.
+* PUT /api/u/[id]: Update user profile.
 * DELETE /api/u/[id]: Delete user by id.
