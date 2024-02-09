@@ -7,61 +7,48 @@ using Microsoft.Extensions.Options;
 using MelodyMuseAPI_DotNet8.Data;
 using MelodyMuseAPI_DotNet8.Dtos;
 using MelodyMuseAPI_DotNet8.Services;
+using MelodyMuseAPI_DotNet8.Interfaces;
+using System.Xml.Linq;
+using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
 [TestFixture]
 public class UserUnitTest
 {
-    private Mock<IMongoCollection<User>> _mockUserCollection;
-    private UserService _userService;
+    private readonly IUserService _userService;
+
+    public UserUnitTest()
+    {
+        var services = new ServiceCollection();
+        services.AddTransient<IUserService, UserService>();
+
+        var serviceProvider = services.BuildServiceProvider();
+
+        _userService = serviceProvider.GetService<IUserService>();
+    }
 
     [SetUp]
     public void Setup()
     {
-        // Mock the user collection
-        _mockUserCollection = new Mock<IMongoCollection<User>>();
-
-        // Mock the MongoDB settings
-        var mockMongoDbSettings = new Mock<IOptions<MongoDBSettings>>();
-        mockMongoDbSettings.Setup(s => s.Value).Returns(new MongoDBSettings
-        {
-            // Configure your MongoDB settings here
-        });
-
-        // Mock the MongoDB client and database, then set up to return the mock collection
-        var mockMongoDatabase = new Mock<IMongoDatabase>();
-        var mockMongoClient = new Mock<IMongoClient>();
-        mockMongoClient.Setup(c => c.GetDatabase(It.IsAny<string>(), null))
-                       .Returns(mockMongoDatabase.Object);
-        mockMongoDatabase.Setup(db => db.GetCollection<User>(It.IsAny<string>(), null))
-                         .Returns(_mockUserCollection.Object);
-
-        // Initialize the service with mocked dependencies
-        var mongoDBService = new MongoDBService(mockMongoDbSettings.Object);
-        _userService = new UserService(mongoDBService);
+       
     }
 
     [Test]
     public async Task AddUser_ShouldAddUserSuccessfully()
     {
-        // Arrange
         var userRegistrationDto = new UserRegistrationDto
         {
-            Username = "TestUser",
-            Email = "test@example.com",
+            Name = "John",
+            Username = "jMaster123",
+            Email = "jMaster123@example.com",
             Password = "password123"
         };
 
-        // Act
         var result = await _userService.RegisterUser(userRegistrationDto);
 
-        // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual(userRegistrationDto.Email, result.Email);
-        // Additional assertions as necessary
+        Debug.WriteLine("Executed");
 
-        // Verify the insertion call was made once
-        _mockUserCollection.Verify(
-            c => c.InsertOneAsync(It.IsAny<User>(), null, default),
-            Times.Once);
+        Assert.IsNotNull(result);
+        Assert.That(result.Email, Is.EqualTo(userRegistrationDto.Email));
     }
 }

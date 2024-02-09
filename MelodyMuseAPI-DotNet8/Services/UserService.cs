@@ -15,8 +15,20 @@ namespace MelodyMuseAPI_DotNet8.Services
         {
             _mongoDBService = new MongoDBService(mongoDBSettings);
         }
+   
 
-
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _mongoDBService.GetAllAsync();
+        }
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _mongoDBService.GetUserByEmailAsync(email);
+        }
+        public async Task<User> GetUserById(string userId)
+        {
+            return await _mongoDBService.GetUserByIdAsync(userId);
+        }
         public async Task<User> RegisterUser(UserRegistrationDto userRegistrationDto)
         {
             var existingUser = await _mongoDBService.GetUserByEmailAsync(userRegistrationDto.Email);
@@ -58,15 +70,6 @@ namespace MelodyMuseAPI_DotNet8.Services
             var result = await _mongoDBService.DeleteUserAsync(userId);
             return result.IsAcknowledged && result.DeletedCount > 0;
         }
-        public async Task<User> GetUserByEmail(string email)
-        {
-            return await _mongoDBService.GetUserByEmailAsync(email);
-        }
-
-        public async Task<User> GetUserById(string userId)
-        {
-            return await _mongoDBService.GetUserByIdAsync(userId);
-        }
         public Task<bool> PurchasePoints(string userId, int points)
         {
             //TODO: add Stripe API connection
@@ -78,8 +81,7 @@ namespace MelodyMuseAPI_DotNet8.Services
             //TODO: implement after acquiring corporate email
             throw new NotImplementedException();
         }
-
-        public async Task<bool> UpdateUserProfile(string userId, UserProfileUpdateDto userProfileUpdateDto)
+        public async Task<bool> UpdateUser(string userId, UserProfileUpdateDto userProfileUpdateDto)
         {
             var updateDefinition = Builders<User>.Update
                 .Set(u => u.Name, userProfileUpdateDto.Name)
