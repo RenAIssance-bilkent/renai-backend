@@ -24,10 +24,10 @@ namespace MelodyMuseAPI.Models
 
         // TODO: Add those fields to actual database
 
-        //[BsonElement("Tracks")]
-        //public List<string> TrackIds { get; set; } = new List<string>();
+        [BsonElement("tracks")]
+        public List<string> TrackIds { get; set; } = new List<string>();
 
-        //[BsonElement("Points")]
-        //public int Points { get; set; }
+        [BsonElement("points")]
+        public int Points { get; set; }
     }
 }

@@ -12,17 +12,7 @@ namespace MelodyMuseAPI_DotNet8.Controllers
         private readonly MongoDBService _mongoDBService;
         public UserController(MongoDBService mongoDBService)
         {
-            _mongoDBService = mongoDBService;
+            
         }
-
-        #region Testing
-
-        [HttpGet]
-        public async Task<List<User>> Get()
-        {
-            return await _mongoDBService.GetAllAsync();
-        }
-
-        #endregion
     }
 }
