@@ -1,6 +1,15 @@
+using MelodyMuseAPI_DotNet8.Data;
+using MelodyMuseAPI_DotNet8.Interfaces;
+using MelodyMuseAPI_DotNet8.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB")); // settings written in appsettings.json
+builder.Services.AddSingleton<MongoDBService>();
+
 // Add services to the container.
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITrackService, TrackService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
