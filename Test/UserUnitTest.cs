@@ -15,22 +15,21 @@ using Microsoft.Extensions.DependencyInjection;
 [TestFixture]
 public class UserUnitTest
 {
-    private readonly IUserService _userService;
-
-    public UserUnitTest()
-    {
-        var services = new ServiceCollection();
-        services.AddTransient<IUserService, UserService>();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        _userService = serviceProvider.GetService<IUserService>();
-    }
+    private UserService _userService;
 
     [SetUp]
     public void Setup()
     {
-       
+        MongoDBSettings settings = new MongoDBSettings() { 
+            ConnectionURI = "mongodb+srv://cluster0.xkhwfdr.mongodb.net/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority",
+            DatabaseName = "melodymuse",
+            CertificatePath = "X509-cert-5005428808408647310.pfx"
+        };
+        IOptions<MongoDBSettings> myOptions = Options.Create(settings);
+
+        var mongoDBService = new MongoDBService(myOptions);
+
+        _userService = new UserService(mongoDBService);
     }
 
     [Test]

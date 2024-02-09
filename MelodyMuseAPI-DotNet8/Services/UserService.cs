@@ -11,11 +11,10 @@ namespace MelodyMuseAPI_DotNet8.Services
     {
         private readonly MongoDBService _mongoDBService;
 
-        public UserService(IOptions<MongoDBSettings> mongoDBSettings)
+        public UserService(MongoDBService mongoDBService)
         {
-            _mongoDBService = new MongoDBService(mongoDBSettings);
+            _mongoDBService = mongoDBService;
         }
-   
 
         public async Task<List<User>> GetAllUsers()
         {
