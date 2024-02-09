@@ -47,8 +47,9 @@ This repository contains the backend API for Melody Muse, an innovative platform
 
 !!! Track class contains string metadata, those are input features for the model that will be determined later so for now it is just string.
 ## API Endpoints
-* POST /api/auth/register: Register a new user.
-* POST /api/auth/login: Authenticate a user.
-* GET /api/tracks: List all tracks for the authenticated user.
+* POST /api/u/register: Register a new user.
+* POST /api/auth/: Authenticate a user.
+* GET /api/u/[id]: Get user by id.
 * POST /api/tracks/generate: Generate a new track.
-* PUT /api/users/update: Update user profile.
+* PUT /api/u: Update user profile.
+* DELETE /api/u/[id]: Delete user by id.
