@@ -3,13 +3,25 @@ using MelodyMuseAPI_DotNet8.Data;
 using MelodyMuseAPI_DotNet8.Dtos;
 using MelodyMuseAPI_DotNet8.Interfaces;
 using Microsoft.Extensions.Options;
+
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
 
 namespace MelodyMuseAPI_DotNet8.Services
 {
     public class UserService : IUserService
     {
         private readonly MongoDBService _mongoDBService;
+
+
+        //Note for Nejo
+        //did not initialize ???
+        private IOptions<JWTSettings> _jwtSettings;
+
 
         public UserService(MongoDBService mongoDBService)
         {
@@ -49,10 +61,75 @@ namespace MelodyMuseAPI_DotNet8.Services
             await _mongoDBService.AddUserAsync(newUser);
             return newUser;
         }
-        public Task<UserTokenDto> AuthenticateUser(UserLoginDto userLoginDto)
+        
+        public async Task<UserTokenDto> AuthenticateUser(UserLoginDto userLoginDto)
         {
-            throw new NotImplementedException();
+
+            var existingUser = await _mongoDBService.GetUserByEmailAsync(userLoginDto.Email);
+            if (existingUser is null)
+            {
+                //return null;
+                throw new InvalidOperationException("Wrong Credentials!"); // Exception will be thrown
+            }
+            bool isValidPasswd = BCrypt.Net.BCrypt.Verify(userLoginDto.Password, existingUser.PasswordHash);
+            
+            if (!isValidPasswd)
+            {
+                //return null;
+                throw new InvalidOperationException("Wrong Credentials!"); // Exception will be thrown
+            }
+
+            // Password is correct, generate JWT token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Value.SecretKey); // Assuming _jwtSettings contains the secret key
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                new Claim(ClaimTypes.NameIdentifier, existingUser.Id),
+                new Claim(ClaimTypes.Email, existingUser.Email)
+                // Add more claims as needed
+            }),
+                Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.Value.ExpirationMinutes), // Set expiration time
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // Return a DTO with user information and token
+            var userTokenDto = new UserTokenDto
+            {
+                UserId = existingUser.Id,
+                Token = tokenHandler.WriteToken(token),
+                ExpiryDate = tokenDescriptor.Expires ?? DateTime.UtcNow.AddMinutes(_jwtSettings.Value.ExpirationMinutes), // Ensure ExpiryDate is set
+                Username = existingUser.Name
+                // Add more user information as needed
+            };
+
+            return userTokenDto;
+
+
+            //throw new NotImplementedException();
         }
+
+        //public string GenerateToken(string userId, string userEmail)
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var key = Encoding.ASCII.GetBytes(secretKey);
+        //    var tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[]
+        //        {
+        //            new Claim(ClaimTypes.NameIdentifier, userId),
+        //            new Claim(ClaimTypes.Email, userEmail)
+        //        }),
+        //        Expires = DateTime.UtcNow.AddMinutes(expirationMinutes), // Set expiration time
+        //        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        //    };
+        //    var token = tokenHandler.CreateToken(tokenDescriptor);
+        //    return tokenHandler.WriteToken(token);
+        //}
+
+
         public async Task<bool> ChangePassword(string userId, UserChangePasswordDto userChangePasswordDto)
         {
             var user = await _mongoDBService.GetUserByIdAsync(userId);

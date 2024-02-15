@@ -4,7 +4,13 @@ using MelodyMuseAPI_DotNet8.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+//configs
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB")); // settings written in appsettings.json
+builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JsonWebToken"));
+
+
+
 builder.Services.AddSingleton<MongoDBService>();
 
 // Add services to the container.
