@@ -3,11 +3,13 @@ using MelodyMuseAPI_DotNet8.Data;
 using MelodyMuseAPI_DotNet8.Dtos;
 using MelodyMuseAPI_DotNet8.Interfaces;
 using Microsoft.Extensions.Options;
+
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
 
 namespace MelodyMuseAPI_DotNet8.Services
 {
@@ -15,9 +17,11 @@ namespace MelodyMuseAPI_DotNet8.Services
     {
         private readonly MongoDBService _mongoDBService;
 
+
         //Note for Nejo
         //did not initialize ???
         private IOptions<JWTSettings> _jwtSettings;
+
 
         public UserService(MongoDBService mongoDBService)
         {
@@ -57,6 +61,7 @@ namespace MelodyMuseAPI_DotNet8.Services
             await _mongoDBService.AddUserAsync(newUser);
             return newUser;
         }
+        
         public async Task<UserTokenDto> AuthenticateUser(UserLoginDto userLoginDto)
         {
 

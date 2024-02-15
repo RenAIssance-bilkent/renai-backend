@@ -1,0 +1,9 @@
+﻿@MelodyMuseAPI-DotNet8_HostAddress = https://localhost:7222
+
+GET {{MelodyMuseAPI-DotNet8_HostAddress}}/api/u
+
+###
+
+GET {{MelodyMuseAPI-DotNet8_HostAddress}}/api/u
+
+###
