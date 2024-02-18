@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MelodyMuseAPI_DotNet8.Controllers
 {
@@ -33,6 +34,12 @@ namespace MelodyMuseAPI_DotNet8.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserById(string id)
         {
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null || currentUserId != id)
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
+
             var user = await _userService.GetUserById(id);
             if (user == null)
             {
@@ -45,6 +52,12 @@ namespace MelodyMuseAPI_DotNet8.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UserProfileUpdateDto updateDto)
         {
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (currentUserId == null || currentUserId != id)
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
+
             var result = await _userService.UpdateUser(id, updateDto);
             if (!result)
             {
@@ -57,6 +70,12 @@ namespace MelodyMuseAPI_DotNet8.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            if (currentUserId == null || currentUserId != id)
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
+
             var result = await _userService.DeleteUser(id);
             if (!result)
             {

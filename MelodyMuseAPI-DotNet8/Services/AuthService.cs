@@ -74,9 +74,9 @@ namespace MelodyMuseAPI_DotNet8.Services
             List<Claim> claims = new List<Claim>()
             {
                 // TODO: ask if you need to add Id to Claim
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
-
             };
 
 
