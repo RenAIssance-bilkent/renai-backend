@@ -2,10 +2,11 @@
 {
     public class UserTokenDto
     {
-        public string Token { get; set; } // holds the JWT (or another form of token)
+        public string Token { get; set; } 
         public DateTime ExpiryDate { get; set; }
-        public string Username { get; set; }
-        public string UserId { get; set; }
+        public string Id { get; set; }
+        public string Email { get; set; }
+        public string Name { get; set; }
     }
 
 }

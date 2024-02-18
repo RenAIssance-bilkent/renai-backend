@@ -16,12 +16,12 @@ namespace MelodyMuseAPI_DotNet8.Services
         public MongoDBService(IOptions<MongoDBSettings> mongoDBSettings)
         {
             var securePassphrase = new SecureString();
+            // TODO: get it from appsettings, not hardcoded
             foreach (char c in "dev")
             {
                 securePassphrase.AppendChar(c);
             }
 
-            // Make sure to mark the SecureString as read-only after modifying it
             securePassphrase.MakeReadOnly();
 
             var connectionString = mongoDBSettings.Value.ConnectionURI;
