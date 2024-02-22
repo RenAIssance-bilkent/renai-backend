@@ -7,7 +7,6 @@
         public string AudioURL { get; set; }
         public string Metadata { get; set; }
 
-        // for example, file uploads for the track itself if not handled by the AudioURL.
     }
 
 }
