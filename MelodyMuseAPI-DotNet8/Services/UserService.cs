@@ -13,35 +13,35 @@ namespace MelodyMuseAPI_DotNet8.Services
 {
     public class UserService : IUserService
     {
-        private readonly MongoDBService _mongoDBService;
+        private readonly MongoDbService _mongoDbService;
 
-        public UserService(MongoDBService mongoDBService)
+        public UserService(MongoDbService mongoDbService)
         {
-            _mongoDBService = mongoDBService;
+            _mongoDbService = mongoDbService;
         }
 
         public async Task<List<User>> GetAllUsers()
         {
-            return await _mongoDBService.GetAllAsync();
+            return await _mongoDbService.GetAllAsync();
         }
 
         public async Task<User> GetUserByEmail(string email)
         {
-            return await _mongoDBService.GetUserByEmailAsync(email);
+            return await _mongoDbService.GetUserByEmailAsync(email);
         }
 
         public async Task<User> GetUserById(string userId)
         {
-            return await _mongoDBService.GetUserByIdAsync(userId);
+            return await _mongoDbService.GetUserByIdAsync(userId);
         }
 
         public async Task<bool> ChangePassword(string userId, UserChangePasswordDto userChangePasswordDto)
         {
-            var user = await _mongoDBService.GetUserByIdAsync(userId);
+            var user = await _mongoDbService.GetUserByIdAsync(userId);
             if (user != null && BCrypt.Net.BCrypt.Verify(userChangePasswordDto.CurrentPassword, user.PasswordHash))
             {
                 var newPasswordHash = BCrypt.Net.BCrypt.HashPassword(userChangePasswordDto.NewPassword);
-                return await _mongoDBService.UpdateUserPasswordAsync(userId, newPasswordHash);
+                return await _mongoDbService.UpdateUserPasswordAsync(userId, newPasswordHash);
             }
 
             return false;
@@ -49,7 +49,7 @@ namespace MelodyMuseAPI_DotNet8.Services
 
         public async Task<bool> DeleteUser(string userId)
         {
-            var result = await _mongoDBService.DeleteUserAsync(userId);
+            var result = await _mongoDbService.DeleteUserAsync(userId);
             return result.IsAcknowledged && result.DeletedCount > 0;
         }
 
@@ -66,7 +66,7 @@ namespace MelodyMuseAPI_DotNet8.Services
                 .Set(u => u.Email, userProfileUpdateDto.Email);
             //TODO: add profile picture
 
-            return await _mongoDBService.UpdateUserAsync(userId, updateDefinition);
+            return await _mongoDbService.UpdateUserAsync(userId, updateDefinition);
         }
     }
 }

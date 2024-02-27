@@ -1,6 +1,6 @@
-﻿namespace MelodyMuseAPI_DotNet8.Data
+﻿namespace MelodyMuseAPI_DotNet8.Settings
 {
-    public class MongoDBSettings
+    public class MongoDbSettings
     {
         public string ConnectionURI { get; set; } = null!;
         public string DatabaseName { get; set; } = null!;

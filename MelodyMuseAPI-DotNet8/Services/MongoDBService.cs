@@ -1,5 +1,5 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Data;
+using MelodyMuseAPI_DotNet8.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -8,12 +8,12 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace MelodyMuseAPI_DotNet8.Services
 {
-    public class MongoDBService
+    public class MongoDbService
     {
         private readonly IMongoCollection<User> _userCollection;
         private readonly IMongoCollection<Track> _trackCollection;
 
-        public MongoDBService(IOptions<MongoDBSettings> mongoDBSettings)
+        public MongoDbService(IOptions<MongoDbSettings> mongoDbSettings)
         {
             var securePassphrase = new SecureString();
             // TODO: get it from appsettings, not hardcoded
@@ -24,11 +24,11 @@ namespace MelodyMuseAPI_DotNet8.Services
 
             securePassphrase.MakeReadOnly();
 
-            var connectionString = mongoDBSettings.Value.ConnectionURI;
+            var connectionString = mongoDbSettings.Value.ConnectionURI;
             var settings = MongoClientSettings.FromConnectionString(connectionString);
 
             settings.ServerApi = new ServerApi(ServerApiVersion.V1);
-            var cert = new X509Certificate2(mongoDBSettings.Value.CertificatePath, securePassphrase);
+            var cert = new X509Certificate2(mongoDbSettings.Value.CertificatePath, securePassphrase);
 
             settings.SslSettings = new SslSettings
             {
@@ -36,7 +36,7 @@ namespace MelodyMuseAPI_DotNet8.Services
             };
             var client = new MongoClient(settings);
 
-            IMongoDatabase database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
+            IMongoDatabase database = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
 
             _userCollection = database.GetCollection<User>("users"); // collection name in data sample
             _trackCollection = database.GetCollection<Track>("tracks");

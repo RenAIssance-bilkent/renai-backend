@@ -1,7 +1,7 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Data;
 using MelodyMuseAPI_DotNet8.Dtos;
 using MelodyMuseAPI_DotNet8.Interfaces;
+using MelodyMuseAPI_DotNet8.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver.Linq;
@@ -14,19 +14,19 @@ namespace MelodyMuseAPI_DotNet8.Services
     public class AuthService : IAuthService
     {
 
-        private readonly MongoDBService _mongoDBService;
-        private readonly IOptions<JWTSettings> _jwtSettings;
+        private readonly MongoDbService _mongoDbService;
+        private readonly IOptions<JwtSettings> _jwtSettings;
 
-        public AuthService(MongoDBService mongoDBService, IOptions<JWTSettings> jWTSettings)
+        public AuthService(MongoDbService mongoDbService, IOptions<JwtSettings> jWTSettings)
         {
-            _mongoDBService = mongoDBService;
+            _mongoDbService = mongoDbService;
             _jwtSettings = jWTSettings;
         }
 
         public async Task<UserTokenDto> LoginUser(UserLoginDto userLoginDto)
         {
 
-            var existingUser = await _mongoDBService.GetUserByEmailAsync(userLoginDto.Email);
+            var existingUser = await _mongoDbService.GetUserByEmailAsync(userLoginDto.Email);
             if (existingUser is null)
             {
                 throw new InvalidOperationException("Wrong Credentials!");
@@ -43,7 +43,7 @@ namespace MelodyMuseAPI_DotNet8.Services
 
         public async Task<User> RegisterUser(UserRegistrationDto userRegistrationDto)
         {
-            var existingUser = await _mongoDBService.GetUserByEmailAsync(userRegistrationDto.Email);
+            var existingUser = await _mongoDbService.GetUserByEmailAsync(userRegistrationDto.Email);
             if (existingUser != null)
             {
                 //TODO: change it to error handling
@@ -59,7 +59,7 @@ namespace MelodyMuseAPI_DotNet8.Services
                 Points = 0
             };
 
-            await _mongoDBService.AddUserAsync(newUser);
+            await _mongoDbService.AddUserAsync(newUser);
             return newUser;
         }
 
