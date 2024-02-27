@@ -7,15 +7,18 @@ namespace MelodyMuseAPI_DotNet8.Services
     public class TrackService : ITrackService
     {
         private readonly MongoDBService _mongoDBService;
-
-        public TrackService(MongoDBService mongoDBService)
+        private readonly OpenAIApiService _openAIApiService;
+        public TrackService(MongoDBService mongoDBService, OpenAIApiService openAIApiService)
         {
             _mongoDBService = mongoDBService;
+            _openAIApiService = openAIApiService;
         }
 
         // TODO: Implement model interaction
         public async Task<Track> GenerateTrack(TrackCreationDto trackCreationDto, string userId)
         {
+            var metadata = _openAIApiService.GetMetadataFromPrompt(trackCreationDto.Prompt);
+
             var newTrack = new Track
             {
                 //TODO: Track title should be generated
@@ -23,9 +26,7 @@ namespace MelodyMuseAPI_DotNet8.Services
                 Genre = trackCreationDto.Genre,
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow,
-                AudioURL = trackCreationDto.AudioURL,
-                Metadata = trackCreationDto.Metadata
-            };
+                Metadata = metadata,
 
             await _mongoDBService.AddTrackAsync(newTrack);
             return newTrack;
