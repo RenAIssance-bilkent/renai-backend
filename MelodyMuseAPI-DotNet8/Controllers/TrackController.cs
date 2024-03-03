@@ -1,9 +1,11 @@
 ﻿using MelodyMuseAPI.Models;
 using MelodyMuseAPI_DotNet8.Dtos;
 using MelodyMuseAPI_DotNet8.Interfaces;
+using MelodyMuseAPI_DotNet8.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using System.Security.Claims;
 
 namespace MelodyMuseAPI_DotNet8.Controllers
@@ -11,13 +13,15 @@ namespace MelodyMuseAPI_DotNet8.Controllers
     [ApiController]
     [Route("api/tracks")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class TrackController : ControllerBase
+    public class TrackController : Controller
     {
         private readonly ITrackService _trackService;
+        private readonly AudioService _audioService;
 
-        public TrackController(ITrackService trackService)
+        public TrackController(ITrackService trackService, AudioService audioService)
         {
             _trackService = trackService;
+            _audioService = audioService;
         }
 
         // POST: api/tracks/generate
@@ -32,6 +36,25 @@ namespace MelodyMuseAPI_DotNet8.Controllers
 
             var trackId = await _trackService.GenerateTrack(trackCreationDto, userId);
             return Ok(new { trackId = trackId });
+        }
+
+        // GET: api/tracks/audio/{id}
+        [HttpGet("audio/{id}")]
+        public async Task<IActionResult> GetAudioById(string id)
+        {
+            var track = await _trackService.GetTrackById(id);
+            if (track == null || string.IsNullOrEmpty(track.AudioURL))
+            {
+                return NotFound("Audio file not found.");
+            }
+
+            var audioStream = await _audioService.DownloadAudioAsync(new ObjectId(track.AudioURL));
+            if (audioStream == null)
+            {
+                return NotFound("Audio file not found.");
+            }
+
+            return File(audioStream, "audio/wav");
         }
 
         // GET: api/tracks/{id}

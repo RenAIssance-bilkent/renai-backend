@@ -4,19 +4,22 @@ using MelodyMuseAPI_DotNet8.Interfaces;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text;
+using MongoDB.Bson;
 
 namespace MelodyMuseAPI_DotNet8.Services
 {
     public class TrackService : ITrackService
     {
         private readonly MongoDbService _mongoDbService;
+        private readonly AudioService _audioService;
         private readonly OpenAIApiService _openAIApiService;
         private readonly ModelApiService _modelApiService;
-        public TrackService(MongoDbService mongoDbService, OpenAIApiService openAIApiService, ModelApiService modelApiService)
+        public TrackService(MongoDbService mongoDbService, OpenAIApiService openAIApiService, ModelApiService modelApiService, AudioService audioService)
         {
             _mongoDbService = mongoDbService;
             _openAIApiService = openAIApiService;
             _modelApiService = modelApiService;
+            _audioService = audioService;   
         }
 
         public async Task<string> GenerateTrack(TrackCreationDto trackCreationDto, string userId)
@@ -48,6 +51,12 @@ namespace MelodyMuseAPI_DotNet8.Services
 
         public async Task<bool> DeleteTrack(string trackId)
         {
+            var track = await _mongoDbService.GetTrackByIdAsync(trackId);
+            if (track != null && !string.IsNullOrEmpty(track.AudioURL))
+            {
+                // AudioURL is the string representation of ObjectId
+                await _audioService.DeleteAudioAsync(new ObjectId(track.AudioURL));
+            }
             return await _mongoDbService.DeleteTrackAsync(trackId);
         }
 

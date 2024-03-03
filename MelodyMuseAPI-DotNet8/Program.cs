@@ -21,6 +21,7 @@ builder.Services.AddSingleton<MongoDbService>();
 #endregion
 
 #region services
+builder.Services.AddScoped<AudioService>();
 builder.Services.AddScoped<ModelApiService>();
 builder.Services.AddScoped<OpenAIApiService>();
 builder.Services.AddScoped<IUserService, UserService>();

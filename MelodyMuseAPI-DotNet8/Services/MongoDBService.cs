@@ -3,6 +3,7 @@ using MelodyMuseAPI_DotNet8.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
@@ -12,6 +13,7 @@ namespace MelodyMuseAPI_DotNet8.Services
     {
         private readonly IMongoCollection<User> _userCollection;
         private readonly IMongoCollection<Track> _trackCollection;
+        private readonly IGridFSBucket _gridFSBucket;
 
         public MongoDbService(IOptions<MongoDbSettings> mongoDbSettings)
         {
@@ -40,6 +42,8 @@ namespace MelodyMuseAPI_DotNet8.Services
 
             _userCollection = database.GetCollection<User>("users"); // collection name in data sample
             _trackCollection = database.GetCollection<Track>("tracks");
+            _gridFSBucket = new GridFSBucket(database);
+
         }
 
         #region UserCollection
@@ -105,5 +109,23 @@ namespace MelodyMuseAPI_DotNet8.Services
         }
         #endregion
 
+        #region AudioBucket
+        public async Task<ObjectId> UploadFileToGridFSAsync(Stream fileStream, string fileName)
+        {
+            var objectId = await _gridFSBucket.UploadFromStreamAsync(fileName, fileStream);
+            return objectId;
+        }
+
+        public async Task<Stream> DownloadFileFromGridFSAsync(ObjectId id)
+        {
+            var stream = await _gridFSBucket.OpenDownloadStreamAsync(id);
+            return stream;
+        }
+
+        public async Task DeleteFileFromGridFSAsync(ObjectId id)
+        {
+            await _gridFSBucket.DeleteAsync(id);
+        }
+        #endregion
     }
 }
