@@ -1,3 +1,5 @@
+> ⚠️ Warning: This is .NET 7 project
+
 # Melody Muse Backend API
 
 This repository contains the backend API for Melody Muse, an innovative platform designed to generate and manage music tracks based on user inputs. Built with .NET 8 and MongoDB, it offers robust user authentication, track generation, and management functionalities.
@@ -14,7 +16,7 @@ This repository contains the backend API for Melody Muse, an innovative platform
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 7 SDK
 - MongoDB installed on your local machine or access to a MongoDB instance
 - Visual Studio or VS Code
 
