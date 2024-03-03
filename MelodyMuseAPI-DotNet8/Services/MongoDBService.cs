@@ -1,19 +1,21 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Data;
+using MelodyMuseAPI_DotNet8.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
 namespace MelodyMuseAPI_DotNet8.Services
 {
-    public class MongoDBService
+    public class MongoDbService
     {
         private readonly IMongoCollection<User> _userCollection;
         private readonly IMongoCollection<Track> _trackCollection;
+        private readonly IGridFSBucket _gridFSBucket;
 
-        public MongoDBService(IOptions<MongoDBSettings> mongoDBSettings)
+        public MongoDbService(IOptions<MongoDbSettings> mongoDbSettings)
         {
             var securePassphrase = new SecureString();
             // TODO: get it from appsettings, not hardcoded
@@ -24,11 +26,11 @@ namespace MelodyMuseAPI_DotNet8.Services
 
             securePassphrase.MakeReadOnly();
 
-            var connectionString = mongoDBSettings.Value.ConnectionURI;
+            var connectionString = mongoDbSettings.Value.ConnectionURI;
             var settings = MongoClientSettings.FromConnectionString(connectionString);
 
             settings.ServerApi = new ServerApi(ServerApiVersion.V1);
-            var cert = new X509Certificate2(mongoDBSettings.Value.CertificatePath, securePassphrase);
+            var cert = new X509Certificate2(mongoDbSettings.Value.CertificatePath, securePassphrase);
 
             settings.SslSettings = new SslSettings
             {
@@ -36,10 +38,12 @@ namespace MelodyMuseAPI_DotNet8.Services
             };
             var client = new MongoClient(settings);
 
-            IMongoDatabase database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
+            IMongoDatabase database = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
 
             _userCollection = database.GetCollection<User>("users"); // collection name in data sample
             _trackCollection = database.GetCollection<Track>("tracks");
+            _gridFSBucket = new GridFSBucket(database);
+
         }
 
         #region UserCollection
@@ -105,5 +109,23 @@ namespace MelodyMuseAPI_DotNet8.Services
         }
         #endregion
 
+        #region AudioBucket
+        public async Task<ObjectId> UploadFileToGridFSAsync(Stream fileStream, string fileName)
+        {
+            var objectId = await _gridFSBucket.UploadFromStreamAsync(fileName, fileStream);
+            return objectId;
+        }
+
+        public async Task<Stream> DownloadFileFromGridFSAsync(ObjectId id)
+        {
+            var stream = await _gridFSBucket.OpenDownloadStreamAsync(id);
+            return stream;
+        }
+
+        public async Task DeleteFileFromGridFSAsync(ObjectId id)
+        {
+            await _gridFSBucket.DeleteAsync(id);
+        }
+        #endregion
     }
 }

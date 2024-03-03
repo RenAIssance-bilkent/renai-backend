@@ -4,8 +4,7 @@
     {
         public string Title { get; set; }
         public string Genre { get; set; }
-        public string AudioURL { get; set; }
-        public string Metadata { get; set; }
+        public string Prompt { get; set; }
 
     }
 

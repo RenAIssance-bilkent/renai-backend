@@ -1,6 +1,6 @@
-using MelodyMuseAPI_DotNet8.Data;
 using MelodyMuseAPI_DotNet8.Interfaces;
 using MelodyMuseAPI_DotNet8.Services;
+using MelodyMuseAPI_DotNet8.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -13,14 +13,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region config
 
-builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
-builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
-builder.Services.AddSingleton<MongoDBService>();
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("Api"));
+builder.Services.AddSingleton<MongoDbService>();
 
 #endregion
 
 #region services
-
+builder.Services.AddScoped<AudioService>();
+builder.Services.AddScoped<ModelApiService>();
+builder.Services.AddScoped<OpenAIApiService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITrackService, TrackService>();
@@ -64,6 +67,11 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
         };
     });
+
+builder.Services.AddHttpClient<ModelApiService>(client =>
+{
+    client.BaseAddress = new Uri("http://0.0.0.0:80"); // URL of the model
+});
 
 builder.Services.AddHttpContextAccessor();
 
