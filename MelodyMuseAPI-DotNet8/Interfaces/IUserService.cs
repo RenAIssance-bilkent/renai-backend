@@ -1,7 +1,7 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Dtos;
+using MelodyMuseAPI.Dtos;
 
-namespace MelodyMuseAPI_DotNet8.Interfaces
+namespace MelodyMuseAPI.Interfaces
 {
     public interface IUserService
     {

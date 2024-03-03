@@ -1,7 +1,7 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Dtos;
-using MelodyMuseAPI_DotNet8.Interfaces;
-using MelodyMuseAPI_DotNet8.Settings;
+using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Interfaces;
+using MelodyMuseAPI.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver.Linq;
@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace MelodyMuseAPI_DotNet8.Services
+namespace MelodyMuseAPI.Services
 {
     public class AuthService : IAuthService
     {

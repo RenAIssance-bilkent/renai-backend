@@ -1,4 +1,4 @@
-﻿namespace MelodyMuseAPI_DotNet8.Settings
+﻿namespace MelodyMuseAPI.Settings
 {
     public class MongoDbSettings
     {

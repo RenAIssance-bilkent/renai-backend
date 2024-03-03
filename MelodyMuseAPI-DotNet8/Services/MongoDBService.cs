@@ -1,5 +1,5 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Settings;
+using MelodyMuseAPI.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -7,7 +7,7 @@ using MongoDB.Driver.GridFS;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
-namespace MelodyMuseAPI_DotNet8.Services
+namespace MelodyMuseAPI.Services
 {
     public class MongoDbService
     {

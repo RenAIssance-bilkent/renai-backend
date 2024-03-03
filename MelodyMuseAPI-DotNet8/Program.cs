@@ -1,6 +1,6 @@
-using MelodyMuseAPI_DotNet8.Interfaces;
-using MelodyMuseAPI_DotNet8.Services;
-using MelodyMuseAPI_DotNet8.Settings;
+using MelodyMuseAPI.Interfaces;
+using MelodyMuseAPI.Services;
+using MelodyMuseAPI.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;

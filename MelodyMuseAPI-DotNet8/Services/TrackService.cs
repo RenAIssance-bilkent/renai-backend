@@ -1,12 +1,12 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Dtos;
-using MelodyMuseAPI_DotNet8.Interfaces;
+using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Interfaces;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text;
 using MongoDB.Bson;
 
-namespace MelodyMuseAPI_DotNet8.Services
+namespace MelodyMuseAPI.Services
 {
     public class TrackService : ITrackService
     {

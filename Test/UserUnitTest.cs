@@ -4,13 +4,13 @@ using MelodyMuseAPI.Models;
 using MongoDB.Driver;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using MelodyMuseAPI_DotNet8.Dtos;
-using MelodyMuseAPI_DotNet8.Services;
-using MelodyMuseAPI_DotNet8.Interfaces;
+using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Services;
+using MelodyMuseAPI.Interfaces;
 using System.Xml.Linq;
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using MelodyMuseAPI_DotNet8.Settings;
+using MelodyMuseAPI.Settings;
 
 [TestFixture]
 public class UserUnitTest

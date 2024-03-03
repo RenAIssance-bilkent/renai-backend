@@ -1,10 +1,10 @@
-﻿using MelodyMuseAPI_DotNet8.Dtos;
+﻿using MelodyMuseAPI.Dtos;
 using System.Text.Json;
 using System.Text;
 using Microsoft.Extensions.Options;
-using MelodyMuseAPI_DotNet8.Settings;
+using MelodyMuseAPI.Settings;
 
-namespace MelodyMuseAPI_DotNet8.Services
+namespace MelodyMuseAPI.Services
 {
     public class ModelApiService
     {

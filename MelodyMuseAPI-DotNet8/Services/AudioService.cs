@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace MelodyMuseAPI_DotNet8.Services
+namespace MelodyMuseAPI.Services
 {
     public class AudioService
     {

@@ -1,14 +1,14 @@
 ﻿using Amazon.SecurityToken.Model;
 using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Dtos;
-using MelodyMuseAPI_DotNet8.Interfaces;
-using MelodyMuseAPI_DotNet8.Services;
+using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Interfaces;
+using MelodyMuseAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace MelodyMuseAPI_DotNet8.Controllers
+namespace MelodyMuseAPI.Controllers
 {
     [ApiController]
     [Route("api/auth")]

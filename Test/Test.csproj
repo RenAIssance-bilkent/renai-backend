@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MelodyMuseAPI-DotNet8\MelodyMuseAPI-DotNet8.csproj" />
+    <ProjectReference Include="..\MelodyMuseAPI-DotNet8\MelodyMuseAPI.csproj" />
   </ItemGroup>
 
 </Project>

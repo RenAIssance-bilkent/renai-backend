@@ -1,4 +1,4 @@
-﻿namespace MelodyMuseAPI_DotNet8.Data
+﻿namespace MelodyMuseAPI.Data
 {
     public class DataContext
     {

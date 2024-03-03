@@ -1,4 +1,4 @@
-﻿namespace MelodyMuseAPI_DotNet8.Dtos
+﻿namespace MelodyMuseAPI.Dtos
 {
     public class TrackModelGenerationResponse
     {

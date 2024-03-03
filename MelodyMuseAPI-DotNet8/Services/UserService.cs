@@ -1,7 +1,7 @@
 ﻿using MelodyMuseAPI.Models;
-using MelodyMuseAPI_DotNet8.Data;
-using MelodyMuseAPI_DotNet8.Dtos;
-using MelodyMuseAPI_DotNet8.Interfaces;
+using MelodyMuseAPI.Data;
+using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Interfaces;
 using Microsoft.Extensions.Options;
 
 using MongoDB.Driver;
@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 
 
-namespace MelodyMuseAPI_DotNet8.Services
+namespace MelodyMuseAPI.Services
 {
     public class UserService : IUserService
     {

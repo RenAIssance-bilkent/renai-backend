@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MelodyMuseAPI-DotNet8", "MelodyMuseAPI-DotNet8\MelodyMuseAPI-DotNet8.csproj", "{EC4496E2-C3C9-48A7-9043-6334743883CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MelodyMuseAPI", "MelodyMuseAPI-DotNet8\MelodyMuseAPI.csproj", "{EC4496E2-C3C9-48A7-9043-6334743883CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
