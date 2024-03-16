@@ -49,9 +49,64 @@ This repository contains the backend API for Melody Muse, an innovative platform
 
 !!! Track class contains string metadata, those are input features for the model that will be determined later so for now it is just string.
 ## API Endpoints
-* POST /api/u/register: Register a new user.
-* POST /api/auth/: Authenticate a user.
-* POST /api/tracks/generate: Generate a new track.
-* GET /api/u/[id]: Get user by id.
-* PUT /api/u/[id]: Update user profile.
-* DELETE /api/u/[id]: Delete user by id.
+
+### Authentication
+
+- **POST /api/auth/login**  
+  Logs in a user by validating their credentials. This endpoint expects a `UserLoginDto` object.
+
+- **POST /api/auth/register**  
+  Registers a new user with the system. This endpoint takes a `UserRegistrationDto` object.
+
+### Track Management
+
+- **POST /api/tracks/generate**  
+  Generates a new track based on provided parameters encapsulated in a `TrackCreationDto` object.
+
+- **GET /api/tracks/audio/{id}**  
+  Retrieves the audio file for a specific track by its ID.
+
+- **GET /api/tracks/{id}**  
+  Fetches detailed information about a specific track using its ID.
+
+- **DELETE /api/tracks/{id}**  
+  Deletes a specific track identified by its ID.
+
+- **GET /api/tracks/user/{userId}**  
+  Lists all tracks created by a specific user, identified by their user ID.
+
+- **POST /api/tracks/search**  
+  Searches for tracks based on criteria defined within the request body.
+
+### User Management
+
+- **GET /api/u**  
+  Retrieves a list of all users.
+
+- **GET /api/u/{id}**  
+  Gets detailed information about a specific user by their user ID.
+
+- **PUT /api/u/{id}**  
+  Updates the profile of a specific user. This endpoint consumes a `UserProfileUpdateDto` object.
+
+- **DELETE /api/u/{id}**  
+  Deletes a user from the system using their user ID.
+
+### Data Transfer Objects (DTOs)
+
+- **TrackCreationDto**  
+  Contains information necessary for creating a new track, such as the title, duration, and audio file.
+
+- **UserLoginDto**  
+  Includes credentials (email and password) required for logging into the system.
+
+- **UserRegistrationDto**  
+  Holds information required for registering a new user, including their email, password, and username.
+
+- **UserProfileUpdateDto**  
+  Contains fields that can be updated in a user's profile, such as their username and email.
+
+### Authorization
+
+Certain endpoints require the user to be authenticated. Such endpoints will respond with a 401 Unauthorized status code if the request lacks a valid authentication token.
+
