@@ -5,12 +5,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>MelodyMuseAPI</RootNamespace>
+    <UserSecretsId>7966f424-7e05-423f-ab0d-a06c7dce6120</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
     <PackageReference Include="MongoDB.Bson" Version="2.23.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.23.1" />

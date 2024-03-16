@@ -17,34 +17,20 @@ namespace MelodyMuseAPI.Services
 
         public MongoDbService(IOptions<MongoDbSettings> mongoDbSettings)
         {
-            var securePassphrase = new SecureString();
-            // TODO: get it from appsettings, not hardcoded
-            foreach (char c in "dev")
-            {
-                securePassphrase.AppendChar(c);
-            }
-
-            securePassphrase.MakeReadOnly();
-
             var connectionString = mongoDbSettings.Value.ConnectionURI;
             var settings = MongoClientSettings.FromConnectionString(connectionString);
 
             settings.ServerApi = new ServerApi(ServerApiVersion.V1);
-            var cert = new X509Certificate2(mongoDbSettings.Value.CertificatePath, securePassphrase);
 
-            settings.SslSettings = new SslSettings
-            {
-                ClientCertificates = new List<X509Certificate>() { cert }
-            };
             var client = new MongoClient(settings);
 
-            IMongoDatabase database = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
+            var database = client.GetDatabase(mongoDbSettings.Value.DatabaseName);
 
-            _userCollection = database.GetCollection<User>("users"); // collection name in data sample
-            _trackCollection = database.GetCollection<Track>("tracks");
+            _userCollection = database.GetCollection<User>("users"); // Adjust the collection name as necessary
+            _trackCollection = database.GetCollection<Track>("tracks"); // Adjust the collection name as necessary
             _gridFSBucket = new GridFSBucket(database);
-
         }
+
 
         #region UserCollection
         // This function is for testing, remove on deploy
