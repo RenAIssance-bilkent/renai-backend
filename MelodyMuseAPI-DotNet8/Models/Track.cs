@@ -28,5 +28,8 @@ namespace MelodyMuseAPI.Models
 
         [BsonElement("metadata")]
         public string Metadata { get; set; }
+
+        [BsonElement("model")]
+        public string Model { get; set; }
     }
 }

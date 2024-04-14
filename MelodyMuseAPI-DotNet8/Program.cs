@@ -15,14 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("Api"));
+builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
 builder.Services.AddSingleton<MongoDbService>();
 
 #endregion
 
 #region services
 builder.Services.AddScoped<AudioService>();
-builder.Services.AddScoped<ModelApiService>();
+builder.Services.AddScoped<ModelService>();
 builder.Services.AddScoped<OpenAIApiService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -67,11 +67,6 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
         };
     });
-
-builder.Services.AddHttpClient<ModelApiService>(client =>
-{
-    client.BaseAddress = new Uri("http://0.0.0.0:80"); // URL of the model
-});
 
 builder.Services.AddHttpContextAccessor();
 

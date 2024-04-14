@@ -55,8 +55,7 @@ namespace MelodyMuseAPI.Services
 
         public Task<bool> PurchasePoints(string userId, int points)
         {
-            //TODO: add Stripe API connection
-            throw new NotImplementedException();
+            return _mongoDbService.AddUserPoints(userId, points);
         }
 
         public async Task<bool> UpdateUser(string userId, UserProfileUpdateDto userProfileUpdateDto)

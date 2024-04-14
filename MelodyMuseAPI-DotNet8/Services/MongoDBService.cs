@@ -68,6 +68,32 @@ namespace MelodyMuseAPI.Services
         {
             return await _userCollection.DeleteOneAsync(user => user.Id == userId);
         }
+        public async Task<bool> ReduceUserPoints(string userId, int points)
+        {
+            if (points < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(points), "Points to reduce cannot be negative.");
+            }
+
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update.Inc(u => u.Points, -points);
+            var result = await _userCollection.UpdateOneAsync(filter, update);
+
+            return result.ModifiedCount > 0;
+        }
+        public async Task<bool> AddUserPoints(string userId, int points)
+        {
+            if (points < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(points), "Points to add cannot be negative.");
+            }
+
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update.Inc(u => u.Points, points);
+            var result = await _userCollection.UpdateOneAsync(filter, update);
+
+            return result.ModifiedCount > 0;
+        }
         #endregion
 
         #region TaskCollection

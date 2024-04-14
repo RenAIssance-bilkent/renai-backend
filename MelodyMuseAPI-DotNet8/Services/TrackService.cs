@@ -13,18 +13,18 @@ namespace MelodyMuseAPI.Services
         private readonly MongoDbService _mongoDbService;
         private readonly AudioService _audioService;
         private readonly OpenAIApiService _openAIApiService;
-        private readonly ModelApiService _modelApiService;
-        public TrackService(MongoDbService mongoDbService, OpenAIApiService openAIApiService, ModelApiService modelApiService, AudioService audioService)
+        private readonly ModelService _modelService;
+        public TrackService(MongoDbService mongoDbService, OpenAIApiService openAIApiService, ModelService modelService, AudioService audioService)
         {
             _mongoDbService = mongoDbService;
             _openAIApiService = openAIApiService;
-            _modelApiService = modelApiService;
+            _modelService = modelService;
             _audioService = audioService;   
         }
 
         public async Task<string> GenerateTrack(TrackCreationDto trackCreationDto, string userId)
         {
-            var metadata = _openAIApiService.GetMetadataFromPrompt(trackCreationDto.Prompt);
+            var metadata = await _openAIApiService.GetMetadataFromPrompt(trackCreationDto.Prompt, userId);
 
             var newTrackGen = new TrackModelGenerationDto
             {
@@ -35,8 +35,15 @@ namespace MelodyMuseAPI.Services
                 Metadata = metadata,
             };
 
-            var trackId = await _modelApiService.GenerateTrackAsync(newTrackGen);
-            return trackId;
+            var isEnoughPoints = await _mongoDbService.ReduceUserPoints(userId, metadata.Length); //TODO: Calculate points, can be hardcoded.
+
+            if (isEnoughPoints)
+            {
+                var trackId = await _modelService.GenerateTrackAsync(newTrackGen);
+                return trackId;
+            }
+
+            throw new Exception("Not enough points."); 
         }
 
         public async Task<Track> GetTrackById(string trackId)
