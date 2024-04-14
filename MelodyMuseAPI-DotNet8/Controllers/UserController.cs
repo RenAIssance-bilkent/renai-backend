@@ -52,7 +52,7 @@ namespace MelodyMuseAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UserProfileUpdateDto updateDto)
         {
-            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (currentUserId == null || currentUserId != id)
             {
                 return Unauthorized("Unauthorized Access.");
@@ -70,7 +70,7 @@ namespace MelodyMuseAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (currentUserId == null || currentUserId != id)
             {
                 return Unauthorized("Unauthorized Access.");
@@ -82,6 +82,27 @@ namespace MelodyMuseAPI.Controllers
                 return NotFound($"User with ID {id} not found.");
             }
             return NoContent();
+        }
+
+        // POST: api/u/purchase
+        [HttpPost("/purchase")]
+        public async Task<IActionResult> PurchasePoints(PurchasePointsDto ppdto)
+        {
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == null || currentUserId != ppdto.UserId)
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
+
+            try
+            {
+                var result = await _userService.PurchasePoints(ppdto.UserId, ppdto.Points);
+                return Ok(result);
+
+            } catch (ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
