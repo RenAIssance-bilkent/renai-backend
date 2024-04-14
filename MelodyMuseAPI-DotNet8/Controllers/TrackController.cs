@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace MelodyMuseAPI.Controllers
 {
     [ApiController]
-    [Route("api/tracks")]
+    [Route("api/t")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TrackController : Controller
     {
@@ -24,7 +24,7 @@ namespace MelodyMuseAPI.Controllers
             _audioService = audioService;
         }
 
-        // POST: api/tracks/generate
+        // POST: api/t/generate
         [HttpPost("generate")]
         public async Task<ActionResult<string>> GenerateTrack([FromBody] TrackCreationDto trackCreationDto)
         {
@@ -38,7 +38,7 @@ namespace MelodyMuseAPI.Controllers
             return Ok(new { trackId = trackId });
         }
 
-        // GET: api/tracks/audio/{id}
+        // GET: api/t/audio/{id}
         [HttpGet("audio/{id}")]
         public async Task<IActionResult> GetAudioById(string id)
         {
@@ -57,7 +57,7 @@ namespace MelodyMuseAPI.Controllers
             return File(audioStream, "audio/wav");
         }
 
-        // GET: api/tracks/{id}
+        // GET: api/t/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Track>> GetTrackById(string id)
         {
@@ -69,15 +69,15 @@ namespace MelodyMuseAPI.Controllers
             return Ok(track);
         }
 
-        // GET: api/tracks/user/{userId}
-        [HttpGet("user/{userId}")]
+        // GET: api/t/u/{userId}
+        [HttpGet("u/{userId}")]
         public async Task<ActionResult<IEnumerable<Track>>> GetTracksByUser(string userId)
         {
             var tracks = await _trackService.GetTracksByUser(userId);
             return Ok(tracks);
         }
 
-        // DELETE: api/tracks/{id}
+        // DELETE: api/t/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrack(string id)
         {
@@ -89,7 +89,7 @@ namespace MelodyMuseAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/tracks/search
+        // POST: api/t/search
         [HttpPost("search")]
         public async Task<ActionResult<IEnumerable<Track>>> SearchTracks([FromBody] string searchTerm)
         {
