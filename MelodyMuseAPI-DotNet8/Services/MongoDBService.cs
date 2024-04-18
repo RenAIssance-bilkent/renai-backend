@@ -1,4 +1,5 @@
-﻿using MelodyMuseAPI.Models;
+﻿using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Models;
 using MelodyMuseAPI.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
@@ -34,18 +35,24 @@ namespace MelodyMuseAPI.Services
 
         #region UserCollection
         // This function is for testing, remove on deploy
-        public async Task<List<User>> GetAllAsync()
+        public async Task<List<UserDto>> GetAllAsync()
         {
-            return await _userCollection.Find(new BsonDocument()).ToListAsync();
+            var users = await _userCollection.Find(new BsonDocument()).ToListAsync();
+            return users.ConvertAll(user => ToDto(user));
         }
-        public async Task<User> GetUserByEmailAsync(string email)
+
+        public async Task<UserDto> GetUserByEmailAsync(string email)
         {
-            return await _userCollection.Find(user => user.Email == email).FirstOrDefaultAsync();
+            var user = await _userCollection.Find(user => user.Email == email).FirstOrDefaultAsync();
+            return ToDto(user);
         }
-        public async Task<User> GetUserByIdAsync(string userId)
+
+        public async Task<UserDto> GetUserByIdAsync(string userId)
         {
-            return await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+            var user = await _userCollection.Find(user => user.Id == userId).FirstOrDefaultAsync();
+            return ToDto(user);
         }
+
         public async Task AddUserAsync(User user)
         {
             await _userCollection.InsertOneAsync(user);
@@ -93,6 +100,59 @@ namespace MelodyMuseAPI.Services
             var result = await _userCollection.UpdateOneAsync(filter, update);
 
             return result.ModifiedCount > 0;
+        }
+        public async Task<bool> ValidateConfirmationTokenAsync(string userEmail, string token)
+        {
+            var user = await _userCollection.Find(user => user.Email == userEmail).FirstOrDefaultAsync();
+
+            if (user == null || user.ConfirmationToken != token || user.IsConfirmed)
+                return false;
+
+            var updateDefinition = Builders<User>.Update
+                .Set(u => u.IsConfirmed, true)
+                .Set(u => u.ConfirmationToken, ""); // or Unset
+
+            var updateResult = await _userCollection.UpdateOneAsync(
+                Builders<User>.Filter.Eq(u => u.Id, user.Id),
+                updateDefinition);
+
+            return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+        }
+
+        public async Task<bool> ValidatePasswordHashByIdAsync(string userId, string password)
+        {
+            var user = await _userCollection.Find(user => user.Id == userId)
+                                            .FirstOrDefaultAsync();
+
+            if (user == null)
+                return false;
+
+            return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+        }
+
+        public async Task<bool> ValidatePasswordHashByEmailAsync(string userEmail, string password)
+        {
+            var user = await _userCollection.Find(user => user.Email == userEmail)
+                                            .FirstOrDefaultAsync();
+
+            if (user == null)
+                return false;
+
+            return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+        }
+
+        private UserDto ToDto(User user)
+        {
+            if (user == null) return null;
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Name = user.Name,
+                Points = user.Points,
+                TrackIds = user.TrackIds
+            };
         }
         #endregion
 

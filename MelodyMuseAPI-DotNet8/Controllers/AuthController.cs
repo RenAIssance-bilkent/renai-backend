@@ -1,12 +1,7 @@
-﻿using Amazon.SecurityToken.Model;
-using MelodyMuseAPI.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using MelodyMuseAPI.Dtos;
 using MelodyMuseAPI.Interfaces;
-using MelodyMuseAPI.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MelodyMuseAPI.Controllers
 {
@@ -15,6 +10,7 @@ namespace MelodyMuseAPI.Controllers
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
+
         public AuthController(IAuthService authService)
         {
             _authService = authService;
@@ -23,31 +19,37 @@ namespace MelodyMuseAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
         {
-            try
+            var loginResult = await _authService.LoginUser(userLoginDto);
+            if (!loginResult.Success)
             {
-                var userToken = await _authService.LoginUser(userLoginDto);
-                return Ok(userToken);
+                return Unauthorized(new { Errors = loginResult.Errors });
             }
-            catch (InvalidOperationException ex)
-            {
-                // TODO: handle the thrown exception for wrong credentials if needed
-                return Unauthorized(ex.Message);
-            }
+            return Ok(loginResult);
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegistrationDto userRegistrationDto)
         {
-            try
+            var registrationResult = await _authService.RegisterUser(userRegistrationDto);
+            if (!registrationResult.Success)
             {
-                var newUser = await _authService.RegisterUser(userRegistrationDto);
-                return Ok(newUser);
+                return BadRequest(new { Errors = registrationResult.Errors });
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(registrationResult);
         }
 
+        [HttpGet("c")]
+        public async Task<IActionResult> ConfirmEmail(string token, string email)
+        {
+            var result = await _authService.ConfirmEmailAsync(token, email);
+            if (result)
+            {
+                return Ok("Email confirmed successfully.");
+            }
+            else
+            {
+                return BadRequest("Incorrect token or identification.");
+            }
+        }
     }
 }

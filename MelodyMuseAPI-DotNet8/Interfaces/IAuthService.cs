@@ -1,12 +1,14 @@
 ﻿using MelodyMuseAPI.Models;
 using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Services;
 
 namespace MelodyMuseAPI.Interfaces
 {
     public interface IAuthService
     {
-        Task<User> RegisterUser(UserRegistrationDto userRegistrationDto);
-        Task<UserTokenDto> LoginUser(UserLoginDto userLoginDto);
+        Task<RegistrationResult> RegisterUser(UserRegistrationDto userRegistrationDto);
+        Task<LoginResult> LoginUser(UserLoginDto userLoginDto);
+        Task<bool> ConfirmEmailAsync(string token, string email);
         Task<bool> ResetPassword(UserResetPasswordDto userResetPasswordDto);
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace MelodyMuseAPI.Controllers
 {
@@ -16,10 +17,12 @@ namespace MelodyMuseAPI.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
+        private readonly EmailSenderService _emailSenderService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, EmailSenderService emailSenderService)
         {
             _userService = userService;
+            _emailSenderService = emailSenderService;
         }
 
         // GET: api/u
@@ -85,7 +88,7 @@ namespace MelodyMuseAPI.Controllers
         }
 
         // POST: api/u/purchase
-        [HttpPost("/purchase")]
+        [HttpPost("purchase")]
         public async Task<IActionResult> PurchasePoints(PurchasePointsDto ppdto)
         {
             var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;

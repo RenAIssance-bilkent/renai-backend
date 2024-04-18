@@ -16,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDb"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
+builder.Services.Configure<AuthMessageSenderSettings>(builder.Configuration.GetSection("SendGrid"));
+
 builder.Services.AddSingleton<MongoDbService>();
 
 #endregion
@@ -24,9 +26,12 @@ builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddScoped<AudioService>();
 builder.Services.AddScoped<ModelService>();
 builder.Services.AddScoped<OpenAIApiService>();
+builder.Services.AddScoped<EmailSenderService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITrackService, TrackService>();
+
+builder.Services.AddHttpClient<OpenAIApiService>();
 
 #endregion
 

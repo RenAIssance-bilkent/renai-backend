@@ -6,9 +6,9 @@ namespace MelodyMuseAPI.Interfaces
     public interface IUserService
     {
         //TODO: this mehtod is ONLY for testing, delete of release
-        Task<List<User>> GetAllUsers();
-        Task<User> GetUserById(string userId);
-        Task<User> GetUserByEmail(string email);
+        Task<List<UserDto>> GetAllUsers();
+        Task<UserDto> GetUserById(string userId);
+        Task<UserDto> GetUserByEmail(string email);
         Task<bool> UpdateUser(string userId, UserProfileUpdateDto userProfileUpdateDto);
         Task<bool> ChangePassword(string userId, UserChangePasswordDto userChangePasswordDto);
         Task<bool> DeleteUser(string userId);

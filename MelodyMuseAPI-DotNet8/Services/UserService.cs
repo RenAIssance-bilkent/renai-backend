@@ -20,25 +20,26 @@ namespace MelodyMuseAPI.Services
             _mongoDbService = mongoDbService;
         }
 
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<UserDto>> GetAllUsers()
         {
             return await _mongoDbService.GetAllAsync();
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<UserDto> GetUserByEmail(string email)
         {
             return await _mongoDbService.GetUserByEmailAsync(email);
         }
 
-        public async Task<User> GetUserById(string userId)
+        public async Task<UserDto> GetUserById(string userId)
         {
             return await _mongoDbService.GetUserByIdAsync(userId);
         }
 
         public async Task<bool> ChangePassword(string userId, UserChangePasswordDto userChangePasswordDto)
         {
-            var user = await _mongoDbService.GetUserByIdAsync(userId);
-            if (user != null && BCrypt.Net.BCrypt.Verify(userChangePasswordDto.CurrentPassword, user.PasswordHash))
+            var isValid = await _mongoDbService.ValidatePasswordHashByIdAsync(userId, userChangePasswordDto.CurrentPassword);
+
+            if (isValid)
             {
                 var newPasswordHash = BCrypt.Net.BCrypt.HashPassword(userChangePasswordDto.NewPassword);
                 return await _mongoDbService.UpdateUserPasswordAsync(userId, newPasswordHash);

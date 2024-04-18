@@ -38,7 +38,6 @@ public class UserUnitTest
         var userRegistrationDto = new UserRegistrationDto
         {
             Name = "John",
-            Username = "jMaster123",
             Email = "jMaster123@example.com",
             Password = "password123"
         };
