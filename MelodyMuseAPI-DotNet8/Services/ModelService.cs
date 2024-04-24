@@ -4,7 +4,6 @@ using System.Text;
 using System.Net.Http;
 using Microsoft.Extensions.Options;
 using MelodyMuseAPI.Settings;
-using RenaiML;
 
 namespace MelodyMuseAPI.Services
 {
@@ -13,14 +12,7 @@ namespace MelodyMuseAPI.Services
         // This code makes no sense
         public async Task<string> GenerateTrackAsync(TrackModelGenerationDto trackModelGenerationDto) {
 
-            var sampleData = new SemanticModel.ModelInput()
-            {
-                Col0 = trackModelGenerationDto.Metadata,
-            };
-
-            var result = SemanticModel.Predict(sampleData);
-
-            return result.ToString();
+            return trackModelGenerationDto.Metadata;
         }
     }
 }

@@ -76,7 +76,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWebApp", policy =>
-        policy.WithOrigins("http://localhost:3000") // Allow your React app origin
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials());
