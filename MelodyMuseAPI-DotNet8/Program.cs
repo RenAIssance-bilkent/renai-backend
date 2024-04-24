@@ -73,8 +73,16 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebApp", policy =>
+        policy.WithOrigins("http://localhost:3000") // Allow your React app origin
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
+});
 
+builder.Services.AddHttpContextAccessor();
 #endregion
 
 var app = builder.Build();
@@ -86,7 +94,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+
+app.UseCors("AllowWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\renaiML\renaiML.csproj" />
   </ItemGroup>
 
   <ItemGroup>

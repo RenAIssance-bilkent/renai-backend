@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
 
 namespace MelodyMuseAPI.Controllers
 {
     [ApiController]
     [Route("api/t")]
+    [EnableCors("AllowWebApp")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TrackController : Controller
     {

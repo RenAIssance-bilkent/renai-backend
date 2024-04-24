@@ -10,7 +10,6 @@ WORKDIR /src
 COPY ["MelodyMuseAPI-DotNet8/MelodyMuseAPI.csproj", "MelodyMuseAPI-DotNet8/"]
 RUN dotnet restore "MelodyMuseAPI-DotNet8/MelodyMuseAPI.csproj"
 COPY . .
-COPY ["MelodyMuseAPI-DotNet8/mongodb-cert.pfx", "app/mongodb-cert.pfx"]
 
 WORKDIR "/src/MelodyMuseAPI-DotNet8"
 RUN dotnet build "MelodyMuseAPI.csproj" -c Release -o /app/build

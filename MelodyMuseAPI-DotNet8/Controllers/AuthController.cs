@@ -2,11 +2,13 @@
 using MelodyMuseAPI.Dtos;
 using MelodyMuseAPI.Interfaces;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 
 namespace MelodyMuseAPI.Controllers
 {
     [ApiController]
     [Route("api/auth")]
+    [EnableCors("AllowWebApp")]
     public class AuthController : Controller
     {
         private readonly IAuthService _authService;
