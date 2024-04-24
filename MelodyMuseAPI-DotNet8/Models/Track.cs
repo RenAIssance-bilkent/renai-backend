@@ -23,8 +23,11 @@ namespace MelodyMuseAPI.Models
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; }
 
-        [BsonElement("audioURL")]
-        public string AudioURL { get; set; }
+        [BsonElement("audioId")]
+        public ObjectId AudioId { get; set; }
+
+        [BsonElement("imageId")]
+        public ObjectId ImageId { get; set; }
 
         [BsonElement("metadata")]
         public string Metadata { get; set; }

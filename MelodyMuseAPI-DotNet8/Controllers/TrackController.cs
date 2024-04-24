@@ -18,12 +18,10 @@ namespace MelodyMuseAPI.Controllers
     public class TrackController : Controller
     {
         private readonly ITrackService _trackService;
-        private readonly AudioService _audioService;
 
-        public TrackController(ITrackService trackService, AudioService audioService)
+        public TrackController(ITrackService trackService)
         {
             _trackService = trackService;
-            _audioService = audioService;
         }
 
         // POST: api/t/generate
@@ -40,50 +38,75 @@ namespace MelodyMuseAPI.Controllers
             return Ok(new { trackId = trackId });
         }
 
-        // GET: api/t/audio/{id}
-        [HttpGet("audio/{id}")]
-        public async Task<IActionResult> GetAudioById(string id)
+        // Get api/t/media/{type}/{id}
+        [HttpGet("media/{type}/{id}")]
+        public async Task<IActionResult> GetMediaById(string type, string id)
         {
-            var track = await _trackService.GetTrackById(id);
-            if (track == null || string.IsNullOrEmpty(track.AudioURL))
+            var stream = await _trackService.GetMediaById(id, type);
+            if (stream == null)
             {
-                return NotFound("Audio file not found.");
+                return NotFound($"{type} not found.");
             }
 
-            var audioStream = await _audioService.DownloadAudioAsync(new ObjectId(track.AudioURL));
-            if (audioStream == null)
-            {
-                return NotFound("Audio file not found.");
-            }
-
-            return File(audioStream, "audio/wav");
+            var contentType = type == "audio" ? "audio/wav" : "image/jpeg"; // Assuming default types
+            return File(stream, contentType);
         }
 
-        // GET: api/t/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Track>> GetTrackById(string id)
+        public async Task<ActionResult<TrackRetrivalDto>> GetTrackById(string id)
         {
             var track = await _trackService.GetTrackById(id);
             if (track == null)
             {
                 return NotFound($"Track with ID {id} not found.");
             }
-            return Ok(track);
+
+            var trackRetrival = new TrackRetrivalDto()
+            {
+                Id = track.Id,
+                UserId = track.UserId,
+                Title = track.Title,
+                Genre = track.Genre,
+                CreatedAt = track.CreatedAt,
+                Metadata = track.Metadata,
+                Model = track.Model,
+                AudioEndpoint = $"api/t/{track.AudioId}/audio",
+                ImageEndpoint = $"api/t/{track.ImageId}/image",
+            };
+            return Ok(trackRetrival);
         }
 
         // GET: api/t/u/{userId}
         [HttpGet("u/{userId}")]
-        public async Task<ActionResult<IEnumerable<Track>>> GetTracksByUser(string userId)
+        public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> GetTracksByUser(string userId)
         {
             var tracks = await _trackService.GetTracksByUser(userId);
-            return Ok(tracks);
+            if (!tracks.Any())
+            {
+                return NotFound($"No tracks found for user ID {userId}.");
+            }
+
+            var trackRetrivals = tracks.Select(track => new TrackRetrivalDto()
+            {
+                Id = track.Id,
+                UserId = track.UserId,
+                Title = track.Title,
+                Genre = track.Genre,
+                CreatedAt = track.CreatedAt,
+                Metadata = track.Metadata,
+                Model = track.Model,
+                AudioEndpoint = $"api/t/{track.AudioId}/audio",
+                ImageEndpoint = $"api/t/{track.ImageId}/image",
+            }).ToList();
+
+            return Ok(trackRetrivals);
         }
 
         // DELETE: api/t/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrack(string id)
         {
-            var result = await _trackService.DeleteTrack(id);
+            bool result = await _trackService.DeleteTrack(id);
             if (!result)
             {
                 return NotFound($"Track with ID {id} not found.");
@@ -93,10 +116,29 @@ namespace MelodyMuseAPI.Controllers
 
         // POST: api/t/search
         [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<Track>>> SearchTracks([FromBody] string searchTerm)
+        public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> SearchTracks([FromBody] string title)
         {
-            var tracks = await _trackService.SearchTracks(searchTerm);
-            return Ok(tracks);
+            var tracks = await _trackService.SearchTracks(title);
+            if (!tracks.Any())
+            {
+                return NotFound($"No tracks found matching '{title}'.");
+            }
+
+            var trackRetrivals = tracks.Select(track => new TrackRetrivalDto()
+            {
+                Id = track.Id,
+                UserId = track.UserId,
+                Title = track.Title,
+                Genre = track.Genre,
+                CreatedAt = track.CreatedAt,
+                Metadata = track.Metadata,
+                Model = track.Model,
+                AudioEndpoint = $"api/t/{track.AudioId}/audio",
+                ImageEndpoint = $"api/t/{track.ImageId}/image",
+            }).ToList();
+
+            return Ok(trackRetrivals);
         }
     }
 }
+

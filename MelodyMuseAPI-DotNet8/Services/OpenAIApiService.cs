@@ -55,6 +55,64 @@ public class OpenAIApiService
 
     }
 
+    public async Task<Stream> GenerateImageFileFromPrompt(string prompt, string userId)
+    {
+        var combinedPrompt = _openAiSettings.ImgPrompt + prompt;
+
+        var requestData = new
+        {
+            model = "dall-e-3", 
+            prompt = combinedPrompt,
+            n = 1,
+            size = "1024x1024",
+            user = userId
+        };
+
+        var json = JsonSerializer.Serialize(requestData);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _openAiSettings.ApiKey);
+
+        var response = await _httpClient.PostAsync(_openAiSettings.ApiEndpoint + "/images/generations", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            using (var doc = JsonDocument.Parse(jsonResponse))
+            {
+                var url = doc.RootElement
+                            .GetProperty("data")
+                            .EnumerateArray()
+                            .First()
+                            .GetProperty("url")
+                            .GetString();
+
+                if (string.IsNullOrEmpty(url))
+                {
+                    throw new InvalidOperationException("Image URL is missing in the response.");
+                }
+
+                using (var client = new HttpClient())
+                {
+                    var imageResponse = await client.GetAsync(url);
+                    if (!imageResponse.IsSuccessStatusCode)
+                    {
+                        throw new HttpRequestException($"Failed to download image: {imageResponse.StatusCode}");
+                    }
+
+                    return await imageResponse.Content.ReadAsStreamAsync();
+                }
+            }
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error response content: {errorContent}");
+            throw new HttpRequestException($"Failed to retrieve image from OpenAI: {response.StatusCode}, Content: {errorContent}");
+        }
+    }
+}
     public class OpenAIResponse
     { 
         public Choice[] Choices { get; set; }
@@ -71,4 +129,3 @@ public class OpenAIApiService
         public string Content { get; set; }
     }
 
-}

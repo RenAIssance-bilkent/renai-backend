@@ -1,18 +1,20 @@
 ﻿using MelodyMuseAPI.Dtos;
-using System.Text.Json;
-using System.Text;
-using System.Net.Http;
-using Microsoft.Extensions.Options;
-using MelodyMuseAPI.Settings;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace MelodyMuseAPI.Services
 {
     public class ModelService
     {
-        // This code makes no sense
-        public async Task<string> GenerateTrackAsync(TrackModelGenerationDto trackModelGenerationDto) {
+        public async Task<Stream> GenerateAudioAsync(TrackGenerationDto trackModelGenerationDto)
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "test.wav");
 
-            return trackModelGenerationDto.Metadata;
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("The specified audio file could not be found.", filePath);
+            }
+            return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
         }
     }
 }

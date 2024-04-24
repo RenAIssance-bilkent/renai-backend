@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using System.Diagnostics;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 
@@ -33,7 +34,7 @@ namespace MelodyMuseAPI.Services
         }
 
 
-        #region UserCollection
+        #region User Handling
         // This function is for testing, remove on deploy
         public async Task<List<UserDto>> GetAllAsync()
         {
@@ -156,48 +157,124 @@ namespace MelodyMuseAPI.Services
         }
         #endregion
 
-        #region TaskCollection
-        public async Task AddTrackAsync(Track track)
+        #region Task Handling
+
+        public async Task<string> AddTrackAsync(TrackGenerationDto trackDto, Stream imageStream, Stream audioStream)
         {
+            var track = new Track()
+            {
+                Title = trackDto.Title,
+                UserId = trackDto.UserId,
+                CreatedAt = trackDto.CreatedAt,
+                Genre = trackDto.Genre,
+                Metadata = trackDto.Metadata,
+                Model = trackDto.Model,
+                ImageId = await UploadTrackImageAsync(imageStream, trackDto.Title), // Instead of name is title of the track
+                AudioId = await UploadAudioFileAsync(audioStream, trackDto.Title)
+            };
+
             await _trackCollection.InsertOneAsync(track);
+
+            return track.Id;
         }
+
+        public async Task<IEnumerable<Track>> GetAllTracksAsync()
+        {
+            return await _trackCollection.Find(new BsonDocument()).ToListAsync();
+        }
+
         public async Task<Track> GetTrackByIdAsync(string trackId)
         {
             return await _trackCollection.Find(t => t.Id == trackId).FirstOrDefaultAsync();
         }
+
         public async Task<IEnumerable<Track>> GetTracksByUserAsync(string userId)
         {
             return await _trackCollection.Find(t => t.UserId == userId).ToListAsync();
         }
+
         public async Task<bool> DeleteTrackAsync(string trackId)
         {
-            var result = await _trackCollection.DeleteOneAsync(t => t.Id == trackId);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            var track = await GetTrackByIdAsync(trackId);
+            if (track != null)
+            {
+                if (track.ImageId != ObjectId.Empty)
+                    await DeleteTrackImageAsync(track.ImageId);
+                if (track.AudioId != ObjectId.Empty)
+                    await DeleteAudioFileAsync(track.AudioId);
+
+                var result = await _trackCollection.DeleteOneAsync(t => t.Id == trackId);
+                return result.IsAcknowledged && result.DeletedCount > 0;
+            }
+            return false;
         }
+
         public async Task<IEnumerable<Track>> SearchTracksAsync(string searchTerm)
         {
             var filter = Builders<Track>.Filter.Regex("title", new BsonRegularExpression(searchTerm, "i"));
             return await _trackCollection.Find(filter).ToListAsync();
         }
+
         #endregion
 
-        #region AudioBucket
-        public async Task<ObjectId> UploadFileToGridFSAsync(Stream fileStream, string fileName)
+
+        #region Media Handling
+
+        public async Task<ObjectId> UploadTrackImageAsync(Stream imageStream, string imageName)
         {
-            var objectId = await _gridFSBucket.UploadFromStreamAsync(fileName, fileStream);
-            return objectId;
+            if (imageStream.CanSeek)
+                imageStream.Seek(0, SeekOrigin.Begin);
+
+            var imageId = await _gridFSBucket.UploadFromStreamAsync(imageName, imageStream);
+            return imageId;
         }
 
-        public async Task<Stream> DownloadFileFromGridFSAsync(ObjectId id)
+        public async Task<ObjectId> UploadAudioFileAsync(Stream audioStream, string audioName)
         {
-            var stream = await _gridFSBucket.OpenDownloadStreamAsync(id);
-            return stream;
+            if (audioStream.CanSeek)
+                audioStream.Seek(0, SeekOrigin.Begin);
+            var audioId = await _gridFSBucket.UploadFromStreamAsync(audioName, audioStream);
+            return audioId;
         }
 
-        public async Task DeleteFileFromGridFSAsync(ObjectId id)
+        public async Task DeleteTrackImageAsync(ObjectId imageId)
         {
-            await _gridFSBucket.DeleteAsync(id);
+            try
+            {
+                await _gridFSBucket.DeleteAsync(imageId);
+            }
+            catch (GridFSFileNotFoundException ex)
+            {
+                Console.WriteLine($"Failed to delete image: {ex.Message}");
+            }
         }
+
+        public async Task DeleteAudioFileAsync(ObjectId audioId)
+        {
+            try
+            {
+                await _gridFSBucket.DeleteAsync(audioId);
+            }
+            catch (GridFSFileNotFoundException ex)
+            {
+                Console.WriteLine($"Failed to delete audio: {ex.Message}");
+            }
+        }
+
+        public async Task<Stream> GetFileByIdAsync(ObjectId fileId)
+        {
+            try
+            {
+                return await _gridFSBucket.OpenDownloadStreamAsync(fileId);
+            }
+            catch (GridFSFileNotFoundException ex)
+            {
+                Console.WriteLine($"File not found: {ex.Message}");
+                return null;
+            }
+        }
+
+
         #endregion
     }
 }

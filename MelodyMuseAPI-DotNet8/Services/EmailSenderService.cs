@@ -11,7 +11,7 @@ namespace MelodyMuseAPI.Services;
 
 public class EmailSenderService
 {
-    public AuthMessageSenderSettings Options { get; } //Set with Secret Manager.
+    public AuthMessageSenderSettings Options { get; }
     public EmailSenderService(IOptions<AuthMessageSenderSettings> optionsAccessor)
     {
         Options = optionsAccessor.Value;
@@ -24,20 +24,17 @@ public class EmailSenderService
             throw new Exception("Null SendGridKey");
         }
 
-        var templateId = "d-ae2751c67a33450bb3451031f61d2ba6"; // Remove hardcoded
-
-        var baseUrl = "https://localhost:32768/api/auth/c"; // Modify with actual API endpoint
-        var link = $"{baseUrl}?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(userEmail)}";
+        var link = $"{Options.BaseURL}/api/auth/c?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(userEmail)}";
 
         var dynamicTemplateData = new DynamicTemplateData(userName, link);
 
-        await Execute(Options.SendGridKey, templateId, dynamicTemplateData, userEmail);
+        await Execute(Options.SendGridKey, Options.TemplateId, dynamicTemplateData, userEmail);
     }
 
     public async Task Execute(string apiKey, string templateId, DynamicTemplateData dynamicTemplateData, string toEmail)
     {
         var client = new SendGridClient(apiKey);
-        var from = new EmailAddress("k.aliyev@ug.bilkent.edu.tr", "MelodyMuse@noreply"); // Remove hardcoded
+        var from = new EmailAddress("k.aliyev@ug.bilkent.edu.tr", "MelodyMuse@noreply"); // TODO: Remove hardcoded
         var to = new EmailAddress(toEmail);
 
         var msg = new SendGridMessage();

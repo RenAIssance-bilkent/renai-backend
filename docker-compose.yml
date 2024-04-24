@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  melodymuseapi:
+    image: ${DOCKER_REGISTRY-}melodymuseapi
+    build:
+      context: .
+      dockerfile: MelodyMuseAPI-DotNet8/Dockerfile
