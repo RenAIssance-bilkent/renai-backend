@@ -56,17 +56,27 @@ namespace MelodyMuseAPI.Services
 
         public Task<bool> PurchasePoints(string userId, int points)
         {
+            if (points < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(points), "Points to add cannot be negative.");
+            }
             return _mongoDbService.AddUserPoints(userId, points);
         }
 
         public async Task<bool> UpdateUser(string userId, UserProfileUpdateDto userProfileUpdateDto)
         {
+            var existingUser = await _mongoDbService.GetUserByEmailAsync(userProfileUpdateDto.Email);
+            if (existingUser != null && existingUser.Id != userId)
+            {
+                return false;
+            }
+
             var updateDefinition = Builders<User>.Update
                 .Set(u => u.Name, userProfileUpdateDto.Name)
                 .Set(u => u.Email, userProfileUpdateDto.Email);
-            //TODO: add profile picture
 
             return await _mongoDbService.UpdateUserAsync(userId, updateDefinition);
         }
+
     }
 }

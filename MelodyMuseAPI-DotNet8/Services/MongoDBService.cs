@@ -91,10 +91,6 @@ namespace MelodyMuseAPI.Services
         }
         public async Task<bool> AddUserPoints(string userId, int points)
         {
-            if (points < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(points), "Points to add cannot be negative.");
-            }
 
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.Inc(u => u.Points, points);
