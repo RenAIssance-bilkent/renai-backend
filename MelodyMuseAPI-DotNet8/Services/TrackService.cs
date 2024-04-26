@@ -48,6 +48,11 @@ namespace MelodyMuseAPI.Services
             throw new Exception("Not enough points."); 
         }
 
+        public async Task<IEnumerable<Track>> GetAllTracks()
+        {
+            return await _mongoDbService.GetAllTracksAsync();
+        }
+
         public async Task<Track> GetTrackById(string trackId)
         {
             return await _mongoDbService.GetTrackByIdAsync(trackId);

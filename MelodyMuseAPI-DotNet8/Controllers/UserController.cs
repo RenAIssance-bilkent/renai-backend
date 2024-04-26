@@ -27,14 +27,6 @@ namespace MelodyMuseAPI.Controllers
             _emailSenderService = emailSenderService;
         }
 
-        // GET: api/u
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
-        {
-            var users = await _userService.GetAllUsers();
-            return Ok(users);
-        }
-
         // GET: api/u/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserById(string id)

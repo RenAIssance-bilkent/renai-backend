@@ -52,6 +52,29 @@ namespace MelodyMuseAPI.Controllers
             return File(stream, contentType);
         }
 
+        // GET: api/t
+        [HttpGet()]
+        public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> GetAllTracks()
+        {
+            var tracks = await _trackService.GetAllTracks();
+
+            var trackRetrivals = tracks.Select(track => new TrackRetrivalDto()
+            {
+                Id = track.Id,
+                UserId = track.UserId,
+                Title = track.Title,
+                Genre = track.Genre,
+                CreatedAt = track.CreatedAt,
+                Metadata = track.Metadata,
+                Model = track.Model,
+                AudioEndpoint = $"api/t/{track.AudioId}/audio",
+                ImageEndpoint = $"api/t/{track.ImageId}/image",
+            }).ToList();
+
+            return Ok(trackRetrivals);
+        }
+
+        // GET: api/t/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<TrackRetrivalDto>> GetTrackById(string id)
         {
