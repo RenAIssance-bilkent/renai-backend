@@ -33,6 +33,15 @@ builder.Services.AddHttpClient<OpenAIApiService>();
 
 #endregion
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowWebApp", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 builder.Services.AddControllers();
 
 #region auth
@@ -71,15 +80,6 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowWebApp", policy =>
-        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials());
-});
-
 builder.Services.AddHttpContextAccessor();
 #endregion
 
@@ -92,10 +92,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowWebApp");
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowWebApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

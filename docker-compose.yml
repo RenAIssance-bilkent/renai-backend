@@ -6,3 +6,5 @@ services:
     build:
       context: .
       dockerfile: MelodyMuseAPI-DotNet8/Dockerfile
+    ports:
+      - "80:80"
