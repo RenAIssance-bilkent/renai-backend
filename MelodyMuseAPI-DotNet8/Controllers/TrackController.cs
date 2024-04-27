@@ -67,8 +67,8 @@ namespace MelodyMuseAPI.Controllers
                 CreatedAt = track.CreatedAt,
                 Metadata = track.Metadata,
                 Model = track.Model,
-                AudioEndpoint = $"api/t/media/audio/{track.AudioId}/",
-                ImageEndpoint = $"api/t/media/image/{track.ImageId}/",
+                AudioEndpoint = $"/api/t/media/audio/{track.AudioId}/",
+                ImageEndpoint = $"/api/t/media/image/{track.ImageId}/",
 
             }).ToList();
 
@@ -94,8 +94,8 @@ namespace MelodyMuseAPI.Controllers
                 CreatedAt = track.CreatedAt,
                 Metadata = track.Metadata,
                 Model = track.Model,
-                AudioEndpoint = $"api/t/{track.AudioId}/audio",
-                ImageEndpoint = $"api/t/{track.ImageId}/image",
+                AudioEndpoint = $"/api/t/media/audio/{track.AudioId}/",
+                ImageEndpoint = $"/api/t/media/image/{track.ImageId}/",
             };
             return Ok(trackRetrival);
         }
@@ -119,8 +119,8 @@ namespace MelodyMuseAPI.Controllers
                 CreatedAt = track.CreatedAt,
                 Metadata = track.Metadata,
                 Model = track.Model,
-                AudioEndpoint = $"api/t/{track.AudioId}/audio",
-                ImageEndpoint = $"api/t/{track.ImageId}/image",
+                AudioEndpoint = $"/api/t/media/audio/{track.AudioId}/",
+                ImageEndpoint = $"/api/t/media/image/{track.ImageId}/",
             }).ToList();
 
             return Ok(trackRetrivals);
@@ -157,8 +157,8 @@ namespace MelodyMuseAPI.Controllers
                 CreatedAt = track.CreatedAt,
                 Metadata = track.Metadata,
                 Model = track.Model,
-                AudioEndpoint = $"api/t/{track.AudioId}/audio",
-                ImageEndpoint = $"api/t/{track.ImageId}/image",
+                AudioEndpoint = $"/api/t/media/audio/{track.AudioId}/",
+                ImageEndpoint = $"/api/t/media/image/{track.ImageId}/",
             }).ToList();
 
             return Ok(trackRetrivals);
