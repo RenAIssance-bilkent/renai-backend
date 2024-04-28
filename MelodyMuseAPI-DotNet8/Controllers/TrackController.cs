@@ -26,7 +26,7 @@ namespace MelodyMuseAPI.Controllers
 
         // POST: api/t/generate
         [HttpPost("generate")]
-        public async Task<ActionResult<string>> GenerateTrack([FromBody] TrackCreationDto trackCreationDto)
+        public async Task<IActionResult> GenerateTrack([FromBody] TrackCreationDto trackCreationDto)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -34,9 +34,34 @@ namespace MelodyMuseAPI.Controllers
                 return Unauthorized("Unauthorized Access.");
             }
 
-            var trackId = await _trackService.GenerateTrack(trackCreationDto, userId);
-            return Ok(new { trackId = trackId });
+            Response.Headers.Add("Content-Type", "text/event-stream");
+
+            var task = Task.Run(async () =>
+            {
+                var trackId = await _trackService.GenerateTrack(trackCreationDto, userId);
+                return trackId;
+            });
+
+            int completionPercent = 0;
+
+            while (!task.IsCompleted && completionPercent < 100)
+            {
+                var jsonMessage = $"data: {{\"log\": \"Test log\", \"completion_percent\": {completionPercent}}}\n\n";
+                await Response.WriteAsync(jsonMessage);
+                await Response.Body.FlushAsync();  
+                await Task.Delay(10000);  
+                completionPercent += 10;  
+            }
+
+            var trackId = await task;  
+            await Response.WriteAsync($"data: {{\"trackId\": \"{trackId}\", \"completion_percent\": 100}}\n\n");  // Send the final message with the track ID
+            await Response.Body.FlushAsync();
+
+            Response.Body.Close();  
+            return new EmptyResult(); 
         }
+
+
 
         // Get api/t/media/{type}/{id}
         [HttpGet("media/{type}/{id}")]

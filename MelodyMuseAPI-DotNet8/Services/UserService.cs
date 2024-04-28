@@ -70,6 +70,12 @@ namespace MelodyMuseAPI.Services
             {
                 return false;
             }
+            var isValid = await _mongoDbService.ValidatePasswordHashByEmailAsync(userId, userProfileUpdateDto.Password);
+
+            if (!isValid)
+            {
+                return false;
+            }
 
             var updateDefinition = Builders<User>.Update
                 .Set(u => u.Name, userProfileUpdateDto.Name)
