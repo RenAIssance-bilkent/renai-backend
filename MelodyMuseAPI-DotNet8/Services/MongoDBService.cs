@@ -83,6 +83,17 @@ namespace MelodyMuseAPI.Services
                 throw new ArgumentOutOfRangeException(nameof(points), "Points to reduce cannot be negative.");
             }
 
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            if (user.Points < points)
+            {
+                return false; // User does not have enough points
+            }
+
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.Inc(u => u.Points, -points);
             var result = await _userCollection.UpdateOneAsync(filter, update);

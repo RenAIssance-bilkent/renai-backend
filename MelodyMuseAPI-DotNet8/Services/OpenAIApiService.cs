@@ -15,7 +15,7 @@ public class OpenAIApiService
         _openAiSettings = openAiSettings.Value;
     }
 
-    public async Task<string> GetMetadataFromPrompt(string prompt, string userId)
+    public async Task<string> GetMetadataFromPromptForReplica(string prompt, string userId)
     {
         var requestData = new
         {

@@ -16,6 +16,7 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<OpenAISettings>(builder.Configuration.GetSection("OpenAI"));
 builder.Services.Configure<AuthMessageSenderSettings>(builder.Configuration.GetSection("SendGrid"));
+builder.Services.Configure<ReplicateSettings>(builder.Configuration.GetSection("Replicate"));
 
 builder.Services.AddSingleton<MongoDbService>();
 

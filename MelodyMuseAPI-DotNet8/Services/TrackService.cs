@@ -22,30 +22,35 @@ namespace MelodyMuseAPI.Services
 
         public async Task<string> GenerateTrack(TrackCreationDto trackCreationDto, string userId)
         {
-            var metadata = await _openAIApiService.GetMetadataFromPrompt(trackCreationDto.Prompt, userId);
+            var isEnoughPoints = await _mongoDbService.ReduceUserPoints(userId, 10); //TODO: Calculate points, can be hardcoded.
 
-            var trackGenerationDto = new TrackGenerationDto
+            if (!isEnoughPoints)
             {
-                UserId = userId,
-                Title = trackCreationDto.Title,
-                Genre = trackCreationDto.Genre,
-                CreatedAt = DateTime.UtcNow,
-                Metadata = metadata,
-            };
+                throw new Exception("Not enough points.");
+            }
 
-            var isEnoughPoints = await _mongoDbService.ReduceUserPoints(userId, metadata.Length); //TODO: Calculate points, can be hardcoded.
-
-            if (isEnoughPoints)
+            if(trackCreationDto.Model == 0)
             {
-               
-                var audioStram = await _modelService.GenerateAudioAsync(trackGenerationDto);
+                var metadata = await _openAIApiService.GetMetadataFromPromptForReplica(trackCreationDto.Prompt, userId);
+
+                var trackGenerationDto = new TrackGenerationDto
+                {
+                    UserId = userId,
+                    Title = trackCreationDto.Title,
+                    Genre = trackCreationDto.Genre,
+                    CreatedAt = DateTime.UtcNow,
+                    Metadata = metadata,
+                };
+
+                var audioStram = await _modelService.GenerateWithReplicateAsync(trackGenerationDto);
                 var imageStram = await _openAIApiService.GenerateImageFileFromPrompt(trackCreationDto.Prompt, userId);
                 var trackId = await _mongoDbService.AddTrackAsync(trackGenerationDto, imageStram, audioStram);
 
                 return trackId;
             }
 
-            throw new Exception("Not enough points."); 
+            throw new Exception("Invalid Model Option");
+           
         }
 
         public async Task<IEnumerable<Track>> GetAllTracks()
