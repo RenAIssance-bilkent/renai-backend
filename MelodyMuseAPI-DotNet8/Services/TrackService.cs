@@ -31,7 +31,7 @@ namespace MelodyMuseAPI.Services
 
             if(trackCreationDto.Model == 0)
             {
-                var metadata = await _openAIApiService.GetMetadataFromPromptForReplica(trackCreationDto.Prompt, userId);
+                var metadata = await _openAIApiService.GetMetadataFromPromptForReplica(trackCreationDto, userId);
 
                 var trackGenerationDto = new TrackGenerationDto
                 {

@@ -3,6 +3,8 @@ using System.Text.Json;
 using System.Text;
 using MelodyMuseAPI.Settings;
 using MelodyMuseAPI.Models;
+using MelodyMuseAPI.Controllers;
+using MelodyMuseAPI.Dtos;
 
 public class OpenAIApiService
 {
@@ -15,15 +17,24 @@ public class OpenAIApiService
         _openAiSettings = openAiSettings.Value;
     }
 
-    public async Task<string> GetMetadataFromPromptForReplica(string prompt, string userId)
+    public async Task<string> GetMetadataFromPromptForReplica(TrackCreationDto trackCreationDto, string userId)
     {
+        var prompt = trackCreationDto.Prompt;
+        string advancedSettings = null;
+        if (trackCreationDto.Energy != null && trackCreationDto.Danceability != null &&
+            trackCreationDto.Loudness != null && trackCreationDto.Valence != null)
+        {
+            prompt += $", danceability: {trackCreationDto.Danceability:F1}, energy: {trackCreationDto.Energy:F1}, " +
+                      $"loudness: {trackCreationDto.Loudness:F1}, valence: {trackCreationDto.Valence:F1}";
+        }
+
         var requestData = new
         {
             model = "gpt-3.5-turbo",
             messages = new[]
             {
                 new { role = "system", content = _openAiSettings.SystemPrompt },
-                new { role = "user", content = prompt }
+                new { role = "user", content = trackCreationDto.Prompt }
             },
             user = userId
         };
