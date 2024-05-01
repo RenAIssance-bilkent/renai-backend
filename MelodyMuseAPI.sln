@@ -5,11 +5,11 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MelodyMuseAPI", "MelodyMuseAPI-DotNet8\MelodyMuseAPI.csproj", "{EC4496E2-C3C9-48A7-9043-6334743883CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "renaiML", "renaiML\renaiML.csproj", "{DAE0003A-AA60-490C-8939-851B8823F88A}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{EBE3F40F-771D-4E19-865F-FEB37B6AA18A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MelodyMuseAPITests", "MelodyMuseAPITests\MelodyMuseAPITests.csproj", "{A3AE2A03-B765-488A-A7F8-B220E4DF4893}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{EC4496E2-C3C9-48A7-9043-6334743883CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC4496E2-C3C9-48A7-9043-6334743883CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC4496E2-C3C9-48A7-9043-6334743883CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9EDF958C-55D7-49A5-96FB-4C515C34D3BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DAE0003A-AA60-490C-8939-851B8823F88A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DAE0003A-AA60-490C-8939-851B8823F88A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAE0003A-AA60-490C-8939-851B8823F88A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +29,10 @@ Global
 		{EBE3F40F-771D-4E19-865F-FEB37B6AA18A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBE3F40F-771D-4E19-865F-FEB37B6AA18A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBE3F40F-771D-4E19-865F-FEB37B6AA18A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3AE2A03-B765-488A-A7F8-B220E4DF4893}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3AE2A03-B765-488A-A7F8-B220E4DF4893}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3AE2A03-B765-488A-A7F8-B220E4DF4893}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3AE2A03-B765-488A-A7F8-B220E4DF4893}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

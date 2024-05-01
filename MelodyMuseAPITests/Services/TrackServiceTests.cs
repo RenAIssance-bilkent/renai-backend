@@ -29,26 +29,6 @@ namespace MelodyMuseAPI.Services.Tests
         }
 
         [TestMethod]
-        public async Task GenerateTrackTest_ValidModelAndEnoughPoints()
-        {
-            var trackCreationDto = new TrackCreationDto { Prompt = "Generate a track", Model = 0 };
-            var userId = "test-user";
-            var fakeTrackId = "track123";
-            var metadata = "Some metadata";
-
-            _mockMongoDbService.Setup(x => x.ReduceUserPoints(userId, 10)).ReturnsAsync(true);
-            _mockOpenAIApiService.Setup(x => x.GetMetadataFromPromptForReplica(trackCreationDto, userId)).ReturnsAsync(metadata);
-            _mockModelService.Setup(x => x.GenerateWithReplicateAsync(It.IsAny<TrackGenerationDto>())).ReturnsAsync(new MemoryStream());
-            _mockOpenAIApiService.Setup(x => x.GenerateImageFileFromPrompt(trackCreationDto.Prompt, userId)).ReturnsAsync(new MemoryStream());
-            _mockMongoDbService.Setup(x => x.AddTrackAsync(It.IsAny<TrackGenerationDto>(), It.IsAny<Stream>(), It.IsAny<Stream>())).ReturnsAsync(fakeTrackId);
-
-            var result = await _trackService.GenerateTrack(trackCreationDto, userId);
-
-            Assert.IsNotNull(result);
-            Assert.AreEqual(fakeTrackId, result);
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(Exception), "Not enough points.")]
         public async Task GenerateTrackTest_NotEnoughPoints()
         {

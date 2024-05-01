@@ -21,12 +21,11 @@ namespace MelodyMuseAPI.Services
 
         public async Task<Stream> GenerateWithReplicateAsync(TrackGenerationDto trackModelGenerationDto)
         {
-            var metadata = new JsonMetadata(trackModelGenerationDto.Metadata);
 
             var requestBody = new
             {
                 version = _replicateSettings.Version,
-                input = new { prompt = metadata.GetValue("enhanced_prompt") }
+                input = new { prompt = trackModelGenerationDto.Metadata.EnhancedPrompt }
             };
 
             var content = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");

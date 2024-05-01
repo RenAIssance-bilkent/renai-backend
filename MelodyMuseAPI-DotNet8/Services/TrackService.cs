@@ -36,10 +36,11 @@ namespace MelodyMuseAPI.Services
                 var trackGenerationDto = new TrackGenerationDto
                 {
                     UserId = userId,
-                    Title = trackCreationDto.Title,
+                    Title = metadata.Title,
                     Genre = trackCreationDto.Genre,
                     CreatedAt = DateTime.UtcNow,
                     Metadata = metadata,
+                    Model = 0
                 };
 
                 var audioStram = await _modelService.GenerateWithReplicateAsync(trackGenerationDto);

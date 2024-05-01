@@ -30,9 +30,9 @@ namespace MelodyMuseAPI.Models
         public ObjectId ImageId { get; set; }
 
         [BsonElement("metadata")]
-        public string Metadata { get; set; }
+        public Metadata Metadata { get; set; }
 
         [BsonElement("model")]
-        public string Model { get; set; }
+        public int Model { get; set; }
     }
 }

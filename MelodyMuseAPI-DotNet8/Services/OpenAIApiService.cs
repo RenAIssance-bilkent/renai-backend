@@ -17,10 +17,9 @@ public class OpenAIApiService
         _openAiSettings = openAiSettings.Value;
     }
 
-    public async Task<string> GetMetadataFromPromptForReplica(TrackCreationDto trackCreationDto, string userId)
+    public async Task<Metadata> GetMetadataFromPromptForReplica(TrackCreationDto trackCreationDto, string userId)
     {
         var prompt = trackCreationDto.Prompt;
-        string advancedSettings = null;
         if (trackCreationDto.Energy != null && trackCreationDto.Danceability != null &&
             trackCreationDto.Loudness != null && trackCreationDto.Valence != null)
         {
@@ -33,9 +32,9 @@ public class OpenAIApiService
             model = "gpt-3.5-turbo",
             messages = new[]
             {
-                new { role = "system", content = _openAiSettings.SystemPrompt },
-                new { role = "user", content = trackCreationDto.Prompt }
-            },
+            new { role = "system", content = _openAiSettings.SystemPrompt },
+            new { role = "user", content = prompt }
+        },
             user = userId
         };
 
@@ -57,13 +56,19 @@ public class OpenAIApiService
                 throw new InvalidOperationException("Received an unexpected format of response data.");
             }
 
-            return responseData.Choices[0].Message.Content.Trim();
+            var metadata = JsonSerializer.Deserialize<Metadata>(responseData.Choices[0].Message.Content.Trim(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (metadata == null)
+            {
+                throw new InvalidOperationException("Failed to deserialize the metadata content.");
+            }
+
+            return metadata;
         }
         else
         {
             throw new HttpRequestException($"Failed to retrieve data from OpenAI: {response.StatusCode}");
         }
-
     }
 
     public async Task<Stream> GenerateImageFileFromPrompt(string prompt, string userId)

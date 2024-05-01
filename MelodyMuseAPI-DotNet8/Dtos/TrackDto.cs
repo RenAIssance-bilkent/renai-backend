@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using MelodyMuseAPI.Models;
+using MongoDB.Bson;
 
 namespace MelodyMuseAPI.Dtos
 {
@@ -9,8 +10,8 @@ namespace MelodyMuseAPI.Dtos
         public string Genre { get; set; }
         public string UserId { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string Metadata { get; set; }
-        public string Model { get; set; }
+        public Metadata Metadata { get; set; }
+        public int Model { get; set; }
         public ObjectId ImageId { get; set; }
         public ObjectId AudioId { get; set; }
         public string ImageBase64 { get; set; }
