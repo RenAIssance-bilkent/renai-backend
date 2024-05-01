@@ -17,6 +17,10 @@ using System.Text;
 using System.Threading.Tasks;
     using global::MelodyMuseAPI.Dtos;
     using Moq;
+    using Xunit;
+    using global::MelodyMuseAPI.Models;
+    using MongoDB.Bson;
+    using MongoDB.Driver;
 
 namespace MelodyMuseAPI.Services.Tests
 {
@@ -33,56 +37,72 @@ namespace MelodyMuseAPI.Services.Tests
                 _userService = new UserService(_mockMongoDbService.Object);
             }
 
-            [TestMethod]
-            public async Task GetAllUsersTest_ReturnsAllUsers()
+            [Fact]
+            public async Task GetAllUsers_ReturnsListOfUsers()
             {
-                var fakeUsers = new List<UserDto> { new UserDto { Email = "user@example.com" } };
-                _mockMongoDbService.Setup(s => s.GetAllAsync()).ReturnsAsync(fakeUsers);
+                // Arrange
 
-                var users = await _userService.GetAllUsers();
+                var users = new List<UserDto> { new UserDto { Id = ObjectId.GenerateNewId().ToString(), Name = "User1", Email = "user1@example.com" }, new UserDto { Id = ObjectId.GenerateNewId().ToString(), Name = "User2", Email = "user2@example.com" } };
+                _mockMongoDbService.Setup(service => service.GetAllAsync()).ReturnsAsync(users);
+                var userService = new UserService(_mockMongoDbService.Object);
 
-                Assert.AreEqual(1, users.Count);
-                Assert.AreEqual("user@example.com", users[0].Email);
+                // Act
+                var result = await userService.GetAllUsers();
+
+                // Assert
+                Assert.Equals(users, result);
             }
 
-            [TestMethod]
+            [Fact]
             public async Task GetUserByEmailTest_ReturnsUser()
             {
 
                 var email = "user@example.com";
                 var fakeUser = new UserDto { Email = email };
+                
                 _mockMongoDbService.Setup(s => s.GetUserByEmailAsync(email)).ReturnsAsync(fakeUser);
 
                 var result = await _userService.GetUserByEmail(email);
 
+                var userService = new UserService(_mockMongoDbService.Object);
+
+
+                // Assert
+                Assert.Equals(email, result.Email);
+
                 Assert.IsNotNull(result);
-                Assert.AreEqual(email, result.Email);
             }
 
-            [TestMethod]
+            [Fact]
             public async Task ChangePasswordTest_SuccessfulChange()
             {
-                var userId = "123";
-                var currentPassword = "oldPass";
-                var newPassword = "newPass";
-                var changePasswordDto = new UserChangePasswordDto { CurrentPassword = currentPassword, NewPassword = newPassword };
+                var userId = ObjectId.GenerateNewId().ToString();
+                var currentPassword = "oldPassword";
+                var newPassword = "newPassword";
+                var userChangePasswordDto = new UserChangePasswordDto { CurrentPassword = currentPassword, NewPassword = newPassword };
+                _mockMongoDbService.Setup(service => service.ValidatePasswordHashByIdAsync(userId, currentPassword)).ReturnsAsync(true);
+                _mockMongoDbService.Setup(service => service.UpdateUserPasswordAsync(userId, It.IsAny<string>())).ReturnsAsync(true);
+                var userService = new UserService(_mockMongoDbService.Object);
 
-                _mockMongoDbService.Setup(s => s.ValidatePasswordHashByIdAsync(userId, currentPassword)).ReturnsAsync(true);
-                _mockMongoDbService.Setup(s => s.UpdateUserPasswordAsync(userId, It.IsAny<string>())).ReturnsAsync(true);
+                // Act
+                var result = await userService.ChangePassword(userId, userChangePasswordDto);
 
-                var result = await _userService.ChangePassword(userId, changePasswordDto);
-
+                // Assert
                 Assert.IsTrue(result);
             }
 
-            [TestMethod]
+            [Fact]
             public async Task DeleteUserTest_UserDeleted()
             {
-                var userId = "123";
-                var deleteResult = new MongoDB.Driver.DeleteResult.Acknowledged(1);
-                _mockMongoDbService.Setup(s => s.DeleteUserAsync(userId)).ReturnsAsync(deleteResult);
+                var userId = ObjectId.GenerateNewId().ToString();
+                var deleteResult = new DeleteResult.Acknowledged(1);
+                _mockMongoDbService.Setup(service => service.DeleteUserAsync(userId)).ReturnsAsync(deleteResult);
+                var userService = new UserService(_mockMongoDbService.Object);
 
-                var result = await _userService.DeleteUser(userId);
+                // Act
+                var result = await userService.DeleteUser(userId);
+
+                // Assert
                 Assert.IsTrue(result);
             }
 
