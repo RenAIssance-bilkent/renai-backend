@@ -24,7 +24,7 @@ public class OpenAIApiService
         "Upbeat dance tracks for a party",
         "Soft jazz for a quiet evening",
         "Classical music for focused work",
-        "Ambient sounds for meditation",
+        "Ambient music for meditation",
         "Country music for road trips",
         "Folk music for a cozy day",
         "Electronic music for gaming",

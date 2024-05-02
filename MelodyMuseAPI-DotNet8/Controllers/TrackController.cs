@@ -81,6 +81,7 @@ namespace MelodyMuseAPI.Controllers
 
         // GET: api/t
         [HttpGet()]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> GetAllTracks()
         {
             var tracks = await _trackService.GetAllTracks();
@@ -104,6 +105,7 @@ namespace MelodyMuseAPI.Controllers
 
         // GET: api/t/random-prompt
         [HttpGet("random-prompt")]
+        [AllowAnonymous]
         public async Task<ActionResult<string>> GetRandomPrompt()
         {
             try
