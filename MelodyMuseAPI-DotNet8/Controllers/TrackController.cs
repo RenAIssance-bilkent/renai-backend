@@ -18,10 +18,12 @@ namespace MelodyMuseAPI.Controllers
     public class TrackController : Controller
     {
         private readonly ITrackService _trackService;
+        private readonly OpenAIApiService _openAIApiService;
 
-        public TrackController(ITrackService trackService)
+        public TrackController(ITrackService trackService, OpenAIApiService openAIApiService)
         {
             _trackService = trackService;
+            _openAIApiService = openAIApiService;
         }
 
         // POST: api/t/generate
@@ -98,6 +100,21 @@ namespace MelodyMuseAPI.Controllers
             }).ToList();
 
             return Ok(trackRetrivals);
+        }
+
+        // GET: api/t/random-prompt
+        [HttpGet("random-prompt")]
+        public async Task<ActionResult<string>> GetRandomPrompt()
+        {
+            try
+            {
+                var randomPrompt = await _openAIApiService.GenerateRandomPrompt();
+                return Ok(randomPrompt);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest($"Error generating random prompt: {ex.Message}");
+            }
         }
 
         // GET: api/t/{id}

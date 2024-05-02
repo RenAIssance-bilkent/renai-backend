@@ -17,6 +17,25 @@ public class OpenAIApiService
         _openAiSettings = openAiSettings.Value;
     }
 
+    private static readonly List<string> _prompts = new List<string>
+    {
+        "Energetic music for exercise",
+        "Relaxing music for studying",
+        "Upbeat dance tracks for a party",
+        "Soft jazz for a quiet evening",
+        "Classical music for focused work",
+        "Ambient sounds for meditation",
+        "Country music for road trips",
+        "Folk music for a cozy day",
+        "Electronic music for gaming",
+        "Rock music for an energetic workout"
+    };
+    // TODO: Call to chat GPT - 3.5. It takes money for each request, so not recomended
+    public async Task<string> GenerateRandomPrompt()
+    {
+        var randomIndex = new Random().Next(_prompts.Count);
+        return _prompts[randomIndex];
+    }
     public async Task<Metadata> GetMetadataFromPromptForReplica(TrackCreationDto trackCreationDto, string userId)
     {
         var prompt = trackCreationDto.Prompt;
