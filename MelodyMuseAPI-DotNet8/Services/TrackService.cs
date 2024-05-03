@@ -20,7 +20,35 @@ namespace MelodyMuseAPI.Services
             _modelService = modelService;  
         }
 
-        public async Task<string> GenerateTrack(TrackCreationDto trackCreationDto, string userId)
+        public async Task<Metadata> GenerateTrackMetadata(TrackCreationDto trackCreationDto, string userId)
+        {
+            if(trackCreationDto.Prompt != null)
+            {
+                var metadata = await _openAIApiService.GetMetadataFromPromptForReplica(trackCreationDto, userId);
+
+                return metadata;
+            }
+            else if(trackCreationDto.Genre != null)
+            {
+                trackCreationDto.Prompt = await _openAIApiService.GeneratePromptBasedOnGenre(trackCreationDto.Genre, userId);
+            }
+            else
+            {
+                throw new ArgumentNullException("Invalid Input: Prompt or Genre has to be given.");
+            }
+
+            if(trackCreationDto.Model == 0)
+            {
+                var metadata = await _openAIApiService.GetMetadataFromPromptForReplica(trackCreationDto, userId);
+
+                return metadata;
+            }
+
+            throw new Exception("Invalid Model Option");
+           
+        }
+
+        public async Task<string> GenerateTrack(Metadata metadata, string userId)
         {
             var isEnoughPoints = await _mongoDbService.ReduceUserPoints(userId, 10); //TODO: Calculate points, can be hardcoded.
 
@@ -29,29 +57,28 @@ namespace MelodyMuseAPI.Services
                 throw new Exception("Not enough points.");
             }
 
-            if(trackCreationDto.Model == 0)
+            if (metadata.Model == 0)
             {
-                var metadata = await _openAIApiService.GetMetadataFromPromptForReplica(trackCreationDto, userId);
 
                 var trackGenerationDto = new TrackGenerationDto
                 {
                     UserId = userId,
                     Title = metadata.Title,
-                    Genre = trackCreationDto.Genre,
+                    Genre = metadata.Genre,
                     CreatedAt = DateTime.UtcNow,
                     Metadata = metadata,
                     Model = 0
                 };
 
                 var audioStram = await _modelService.GenerateWithReplicateAsync(trackGenerationDto);
-                var imageStram = await _openAIApiService.GenerateImageFileFromPrompt(trackCreationDto.Prompt, userId);
+                var imageStram = await _openAIApiService.GenerateImageFileFromPrompt(metadata.EnhancedPrompt, userId);
                 var trackId = await _mongoDbService.AddTrackAsync(trackGenerationDto, imageStram, audioStram);
 
                 return trackId;
             }
 
             throw new Exception("Invalid Model Option");
-           
+
         }
 
         public async Task<IEnumerable<Track>> GetAllTracks()

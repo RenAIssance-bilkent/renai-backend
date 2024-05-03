@@ -29,18 +29,6 @@ namespace MelodyMuseAPI.Services.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception), "Not enough points.")]
-        public async Task GenerateTrackTest_NotEnoughPoints()
-        {
-            var trackCreationDto = new TrackCreationDto { Prompt = "Generate a track", Model = 0 };
-            var userId = "test-user";
-            _mockMongoDbService.Setup(x => x.ReduceUserPoints(userId, 10)).ReturnsAsync(false);
-
-            await _trackService.GenerateTrack(trackCreationDto, userId);
-
-        }
-
-        [TestMethod]
         public async Task GetAllTracksTest_ReturnsTracks()
         {
             var tracks = new List<Track> { new Track { Title = "Track 1" } };

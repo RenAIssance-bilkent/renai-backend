@@ -4,6 +4,9 @@ namespace MelodyMuseAPI.Models
 {
     public class Metadata
     {
+        [JsonPropertyName("model")]
+        public int Model { get; set; }
+
         [JsonPropertyName("genre")]
         public string Genre { get; set; }
 
@@ -27,5 +30,6 @@ namespace MelodyMuseAPI.Models
 
         [JsonPropertyName("valence")]
         public double Valence { get; set; }
+
     }
 }
