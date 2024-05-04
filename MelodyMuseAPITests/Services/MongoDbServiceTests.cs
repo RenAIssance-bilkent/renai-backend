@@ -12,6 +12,10 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver.GridFS;
 using MongoDB.Driver;
 using Moq;
+using MongoDB.Bson;
+using Xunit;
+
+#nullable disable
 
 namespace MelodyMuseAPI.Services.Tests
 {
@@ -25,8 +29,7 @@ namespace MelodyMuseAPI.Services.Tests
         private Mock<IMongoDatabase> _mockDatabase;
         private Mock<IMongoClient> _mockClient;
 
-        [TestInitialize]
-        public void Initialize()
+        public MongoDbServiceTests()
         {
             var settings = new MongoDbSettings { ConnectionURI = "mongodb://localhost:27017", DatabaseName = "testDb" };
             var mockSettings = new Mock<IOptions<MongoDbSettings>>();
@@ -35,20 +38,18 @@ namespace MelodyMuseAPI.Services.Tests
             _mockClient = new Mock<IMongoClient>();
             _mockDatabase = new Mock<IMongoDatabase>();
             _mockUserCollection = new Mock<IMongoCollection<User>>();
-            _mockTrackCollection = new Mock<IMongoCollection<Track>>();
-            _mockGridFSBucket = new Mock<IGridFSBucket>();
 
             _mockClient.Setup(c => c.GetDatabase(It.IsAny<string>(), null)).Returns(_mockDatabase.Object);
             _mockDatabase.Setup(db => db.GetCollection<User>("users", null)).Returns(_mockUserCollection.Object);
-            _mockDatabase.Setup(db => db.GetCollection<Track>("tracks", null)).Returns(_mockTrackCollection.Object);
 
             _service = new MongoDbService(mockSettings.Object);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GetUserByIdAsync_ReturnsCorrectUser()
         {
-            var fakeUserId = "123";
+            // Arrange
+            var fakeUserId = ObjectId.GenerateNewId().ToString();
             var expectedUser = new User { Id = fakeUserId, Email = "user@example.com" };
             var mockCursor = new Mock<IAsyncCursor<User>>();
             mockCursor.Setup(_ => _.Current).Returns(new[] { expectedUser });
@@ -57,25 +58,32 @@ namespace MelodyMuseAPI.Services.Tests
             _mockUserCollection.Setup(x => x.FindSync(It.IsAny<FilterDefinition<User>>(), It.IsAny<FindOptions<User, User>>(), It.IsAny<System.Threading.CancellationToken>()))
                                .Returns(mockCursor.Object);
 
+            // Act
             var result = await _service.GetUserByIdAsync(fakeUserId);
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(expectedUser.Email, result.Email);
+            // Assert
+            Xunit.Assert.NotNull(result);
+            Xunit.Assert.Equal(expectedUser.Email, result.Email);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task AddUserAsync_InsertsUserCorrectly()
         {
+            // Arrange
             var user = new User { Email = "newuser@example.com" };
+
+            // Act
             await _service.AddUserAsync(user);
 
+            // Assert
             _mockUserCollection.Verify(x => x.InsertOneAsync(It.Is<User>(u => u.Email == "newuser@example.com"), null, default));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task UpdateUserPasswordAsync_UpdatesPasswordCorrectly()
         {
-            var userId = "1";
+            // Arrange
+            var userId = ObjectId.GenerateNewId().ToString();
             var newPassword = "newSecurePassword123!";
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update.Set(u => u.PasswordHash, BCrypt.Net.BCrypt.HashPassword(newPassword));
@@ -83,9 +91,11 @@ namespace MelodyMuseAPI.Services.Tests
 
             _mockUserCollection.Setup(x => x.UpdateOneAsync(filter, It.IsAny<UpdateDefinition<User>>(), null, default)).ReturnsAsync(updateResult);
 
+            // Act
             var result = await _service.UpdateUserPasswordAsync(userId, newPassword);
 
-            Assert.IsTrue(result);
+            // Assert
+            Xunit.Assert.True(result);
         }
     }
 }

@@ -29,9 +29,7 @@ namespace MelodyMuseAPI.Services.Tests
         {
             private UserService _userService;
             private Mock<MongoDbService> _mockMongoDbService;
-
-            [TestInitialize]
-            public void Setup()
+            public UserServiceTests()
             {
                 _mockMongoDbService = new Mock<MongoDbService>();
                 _userService = new UserService(_mockMongoDbService.Object);
@@ -50,7 +48,7 @@ namespace MelodyMuseAPI.Services.Tests
                 var result = await userService.GetAllUsers();
 
                 // Assert
-                Assert.Equals(users, result);
+                Xunit.Assert.Equal(users, result);
             }
 
             [Fact]
@@ -68,9 +66,9 @@ namespace MelodyMuseAPI.Services.Tests
 
 
                 // Assert
-                Assert.Equals(email, result.Email);
+                Xunit.Assert.Equal(email, result.Email);
 
-                Assert.IsNotNull(result);
+                Xunit.Assert.NotNull(result);
             }
 
             [Fact]
@@ -88,7 +86,7 @@ namespace MelodyMuseAPI.Services.Tests
                 var result = await userService.ChangePassword(userId, userChangePasswordDto);
 
                 // Assert
-                Assert.IsTrue(result);
+                Xunit.Assert.True(result);
             }
 
             [Fact]
@@ -103,7 +101,7 @@ namespace MelodyMuseAPI.Services.Tests
                 var result = await userService.DeleteUser(userId);
 
                 // Assert
-                Assert.IsTrue(result);
+                Xunit.Assert.True(result);
             }
 
         }
