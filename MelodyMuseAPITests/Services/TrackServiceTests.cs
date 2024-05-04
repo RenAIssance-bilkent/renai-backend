@@ -32,6 +32,8 @@ namespace MelodyMuseAPI.Services.Tests
             _trackService = new TrackService(_mockMongoDbService.Object, _mockOpenAIApiService.Object, _mockModelService.Object);
         }
 
+        [TestMethod]
+        public async Task GetAllTracksTest_ReturnsTracks()
         [Fact]
         public async Task GenerateTrack_WithEnoughPoints_Success()
         {

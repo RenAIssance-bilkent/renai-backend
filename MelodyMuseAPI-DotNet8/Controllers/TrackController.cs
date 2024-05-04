@@ -18,15 +18,17 @@ namespace MelodyMuseAPI.Controllers
     public class TrackController : Controller
     {
         private readonly ITrackService _trackService;
+        private readonly OpenAIApiService _openAIApiService;
 
-        public TrackController(ITrackService trackService)
+        public TrackController(ITrackService trackService, OpenAIApiService openAIApiService)
         {
             _trackService = trackService;
+            _openAIApiService = openAIApiService;
         }
 
         // POST: api/t/generate
         [HttpPost("generate")]
-        public async Task<IActionResult> GenerateTrack([FromBody] TrackCreationDto trackCreationDto)
+        public async Task<IActionResult> GenerateTrack([FromBody] Metadata metadata)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -38,7 +40,7 @@ namespace MelodyMuseAPI.Controllers
 
             var task = Task.Run(async () =>
             {
-                var trackId = await _trackService.GenerateTrack(trackCreationDto, userId);
+                var trackId = await _trackService.GenerateTrack(metadata, userId);
                 return trackId;
             });
 
@@ -61,7 +63,19 @@ namespace MelodyMuseAPI.Controllers
             return new EmptyResult(); 
         }
 
+        [HttpPost("generate-metadata")]
+        public async Task<IActionResult> GenerateMetadata([FromBody] TrackCreationDto trackCreationDto)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
 
+            var metadata = await _trackService.GenerateTrackMetadata(trackCreationDto, userId);
+
+            return Ok(metadata);
+        }
 
         // Get api/t/media/{type}/{id}
         [HttpGet("media/{type}/{id}")]
@@ -79,6 +93,7 @@ namespace MelodyMuseAPI.Controllers
 
         // GET: api/t
         [HttpGet()]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> GetAllTracks()
         {
             var tracks = await _trackService.GetAllTracks();
@@ -98,6 +113,27 @@ namespace MelodyMuseAPI.Controllers
             }).ToList();
 
             return Ok(trackRetrivals);
+        }
+
+        // GET: api/t/random-prompt
+        [HttpGet("random-prompt")]
+        public async Task<ActionResult<string>> GetRandomPrompt()
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
+
+            try
+            {
+                var randomPrompt = await _openAIApiService.GenerateRandomPrompt(userId);
+                return Ok(randomPrompt);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest($"Error generating random prompt: {ex.Message}");
+            }
         }
 
         // GET: api/t/{id}

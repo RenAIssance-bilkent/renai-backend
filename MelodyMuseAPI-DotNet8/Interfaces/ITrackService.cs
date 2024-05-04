@@ -5,7 +5,8 @@ namespace MelodyMuseAPI.Interfaces
 {
     public interface ITrackService
     {
-        Task<string> GenerateTrack(TrackCreationDto trackCreationDto, string userId);
+        Task<string> GenerateTrack(Metadata metadata, string userId);
+        Task<Metadata> GenerateTrackMetadata(TrackCreationDto trackCreationDto, string userId);
         Task<IEnumerable<Track>> GetAllTracks();
         Task<Track> GetTrackById(string trackId);
         Task<IEnumerable<Track>> GetTracksByUser(string userId);
