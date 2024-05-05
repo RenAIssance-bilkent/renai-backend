@@ -6,6 +6,8 @@ using MelodyMuseAPI.Models;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
+using System.Reflection;
 
 namespace MelodyMuseAPI.Tests
 {
@@ -30,8 +32,8 @@ namespace MelodyMuseAPI.Tests
         {
             // Arrange
             var trackCreationDto = new TrackCreationDto { Prompt = "Test Prompt" };
-            var userId = "user123";
-            var expectedMetadata = new Metadata { /* fill with expected metadata */ };
+            var userId = ObjectId.GenerateNewId().ToString();
+            var expectedMetadata = new Metadata { Title="deneme" };
 
             _mockOpenAIApiService.Setup(x => x.GetMetadataFromPromptForReplica(trackCreationDto, userId)).ReturnsAsync(expectedMetadata);
 
@@ -47,7 +49,7 @@ namespace MelodyMuseAPI.Tests
         {
             // Arrange
             var trackCreationDto = new TrackCreationDto { Genre = "Test Genre" };
-            var userId = "user123";
+            var userId = ObjectId.GenerateNewId().ToString();
             var generatedPrompt = "Generated Prompt";
 
             _mockOpenAIApiService.Setup(x => x.GeneratePromptBasedOnGenre(trackCreationDto.Genre, userId)).ReturnsAsync(generatedPrompt);
@@ -65,7 +67,7 @@ namespace MelodyMuseAPI.Tests
         public async Task GetAllTracks_ReturnsAllTracks()
         {
             // Arrange
-            var expectedTracks = new List<Track> { /* fill with expected tracks */ };
+            var expectedTracks = new List<Track> { new Track { Title="kamran"}, new Track { Title="nejo"} };
             _mockMongoDbService.Setup(x => x.GetAllTracksAsync()).ReturnsAsync(expectedTracks);
 
             // Act
