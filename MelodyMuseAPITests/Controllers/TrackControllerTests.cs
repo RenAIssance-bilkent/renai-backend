@@ -1,41 +1,70 @@
 ﻿using Xunit;
 using Moq;
 using MelodyMuseAPI.Controllers;
-using MelodyMuseAPI.Interfaces;
 using MelodyMuseAPI.Models;
-using MelodyMuseAPI.Dtos;
+using MelodyMuseAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
+using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using MelodyMuseAPI.Dtos;
 using MongoDB.Bson;
 
-namespace MelodyMuseAPI.Tests.Controllers
+namespace MelodyMuseAPI.Controllers.Tests
 {
     public class TrackControllerTests
     {
-        private readonly TrackController _controller;
+        private readonly TrackController _trackController;
         private readonly Mock<ITrackService> _mockTrackService;
+        private readonly Mock<OpenAIApiService> _mockOpenAIApiService;
 
         public TrackControllerTests()
         {
             _mockTrackService = new Mock<ITrackService>();
-            _controller = new TrackController(_mockTrackService.Object);
+            _mockOpenAIApiService = new Mock<OpenAIApiService>();
+            _trackController = new TrackController(_mockTrackService.Object, _mockOpenAIApiService.Object);
         }
 
         [Fact]
-        public async Task GenerateTrack_ReturnsUnauthorized_WhenUserIdIsNullOrEmpty()
+        public async Task GenerateTrack_WithValidMetadata_ReturnsTrackId()
         {
             // Arrange
-            var trackCreationDto = new TrackCreationDto();
-            _controller.ControllerContext = new ControllerContext
+            var metadata = new Metadata();
+            var userId = ObjectId.GenerateNewId().ToString();
+            var expectedTrackId = ObjectId.GenerateNewId().ToString();
+
+            var userClaims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId) };
+            var userClaimsIdentity = new ClaimsIdentity(userClaims);
+            var userClaimsPrincipal = new ClaimsPrincipal(userClaimsIdentity);
+            _trackController.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext() { User = userClaimsPrincipal }
+            };
+
+            _mockTrackService.Setup(service => service.GenerateTrack(metadata, userId)).ReturnsAsync(expectedTrackId);
+
+            // Act
+            var result = await _trackController.GenerateTrack(metadata);
+
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(expectedTrackId, okObjectResult.Value);
+        }
+
+        [Fact]
+        public async Task GenerateTrack_WithEmptyUserId_ReturnsUnauthorized()
+        {
+            // Arrange
+            var metadata = new Metadata();
+            _trackController.ControllerContext = new ControllerContext()
             {
                 HttpContext = new DefaultHttpContext()
             };
 
             // Act
-            var result = await _controller.GenerateTrack(trackCreationDto);
+            var result = await _trackController.GenerateTrack(metadata);
 
             // Assert
             var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
@@ -43,67 +72,48 @@ namespace MelodyMuseAPI.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetTrackById_ReturnsOkResult_WhenTrackExists()
+        public async Task GenerateMetadata_WithValidTrackCreationDto_ReturnsOkResult()
         {
             // Arrange
-            var trackId = ObjectId.GenerateNewId().ToString();
-            var track = new TrackRetrivalDto { Id = trackId };
-            _mockTrackService.Setup(service => service.GetTrackById(trackId)).ReturnsAsync(track);
+            var trackCreationDto = new TrackCreationDto();
+            var userId = ObjectId.GenerateNewId().ToString();
+            var expectedMetadata = new Metadata();
+
+            var userClaims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId) };
+            var userClaimsIdentity = new ClaimsIdentity(userClaims);
+            var userClaimsPrincipal = new ClaimsPrincipal(userClaimsIdentity);
+            _trackController.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext() { User = userClaimsPrincipal }
+            };
+
+            _mockTrackService.Setup(service => service.GenerateTrackMetadata(trackCreationDto, userId)).ReturnsAsync(expectedMetadata);
 
             // Act
-            var result = await _controller.GetTrackById(trackId);
+            var result = await _trackController.GenerateMetadata(trackCreationDto);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var retrievedTrack = Assert.IsType<TrackRetrivalDto>(okResult.Value);
-            Assert.Equal(trackId, retrievedTrack.Id);
-        }
-
-      
-        [Fact]
-        public async Task GetAllTracks_ReturnsOkResult_WhenTracksExist()
-        {
-            // Arrange
-            var tracks = new List<TrackRetrivalDto> { new TrackRetrivalDto(), new TrackRetrivalDto() };
-            _mockTrackService.Setup(service => service.GetAllTracks()).ReturnsAsync(tracks);
-
-            // Act
-            var result = await _controller.GetAllTracks();
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var retrievedTracks = Assert.IsAssignableFrom<IEnumerable<TrackRetrivalDto>>(okResult.Value);
-            Assert.Equal(2, retrievedTracks.Count);
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(expectedMetadata, okObjectResult.Value);
         }
 
         [Fact]
-        public async Task DeleteTrack_ReturnsNotFound_WhenTrackDoesNotExist()
+        public async Task GenerateMetadata_WithEmptyUserId_ReturnsUnauthorized()
         {
             // Arrange
-            var trackId = ObjectId.GenerateNewId().ToString();
-            _mockTrackService.Setup(service => service.DeleteTrack(trackId)).ReturnsAsync(false);
+            var trackCreationDto = new TrackCreationDto();
+            _trackController.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext()
+            };
 
             // Act
-            var result = await _controller.DeleteTrack(trackId);
+            var result = await _trackController.GenerateMetadata(trackCreationDto);
 
             // Assert
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            Assert.Equal($"Track with ID {trackId} not found.", notFoundResult.Value);
+            var unauthorizedResult = Assert.IsType<UnauthorizedObjectResult>(result);
+            Assert.Equal("Unauthorized Access.", unauthorizedResult.Value);
         }
 
-        [Fact]
-        public async Task SearchTracks_ReturnsNotFound_WhenNoTracksMatchTitle()
-        {
-            // Arrange
-            var title = "NonExistingTitle";
-            _mockTrackService.Setup(service => service.SearchTracks(title)).ReturnsAsync(new List<TrackRetrivalDto>());
-
-            // Act
-            var result = await _controller.SearchTracks(title);
-
-            // Assert
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
-            Assert.Equal($"No tracks found matching '{title}'.", notFoundResult.Value);
-        }
     }
 }
