@@ -22,7 +22,6 @@ namespace MelodyMuseAPI.Controllers.Tests
         {
             _mockAuthService = new Mock<IAuthService>();
             _authController = new AuthController(_mockAuthService.Object);
-
         }
 
         [Fact]
