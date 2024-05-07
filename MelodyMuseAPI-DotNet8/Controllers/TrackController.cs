@@ -104,6 +104,7 @@ namespace MelodyMuseAPI.Controllers
 
         // Get api/t/media/{type}/{id}
         [HttpGet("media/{type}/{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetMediaById(string type, string id)
         {
             var stream = await _trackService.GetMediaById(id, type);
@@ -226,6 +227,7 @@ namespace MelodyMuseAPI.Controllers
 
         // POST: api/t/search
         [HttpPost("search")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> SearchTracks([FromBody] string title)
         {
             var tracks = await _trackService.SearchTracks(title);

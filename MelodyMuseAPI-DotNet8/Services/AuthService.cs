@@ -67,7 +67,7 @@ namespace MelodyMuseAPI.Services
                 return new RegistrationResult { Success = false, Errors = new List<string> { "Email is already in use." } };
             }
 
-            var confirmationToken = GenerateConfirmationToken();
+            var confirmationToken = _emailSenderService.GenerateConfirmationToken();
 
             var newUser = new User
             {
@@ -80,7 +80,7 @@ namespace MelodyMuseAPI.Services
                 Points = 0
             };
 
-           _emailSenderService.SendConfirmEmailAsync(userRegistrationDto.Name, userRegistrationDto.Email, confirmationToken);
+           _emailSenderService.SendWelcomeConfirmationEmail(userRegistrationDto.Name, userRegistrationDto.Email, confirmationToken);
 
            await _mongoDbService.AddUserAsync(newUser);
 
@@ -119,27 +119,6 @@ namespace MelodyMuseAPI.Services
                 SigningCredentials = creds,
                 Issuer = _jwtSettings.Value.Issuer,
                 Audience = _jwtSettings.Value.Audience
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        private string GenerateConfirmationToken()
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Value.SecretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddDays(1);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim("action", "email_confirmation")
-                }),
-                Expires = expires,
-                SigningCredentials = creds
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

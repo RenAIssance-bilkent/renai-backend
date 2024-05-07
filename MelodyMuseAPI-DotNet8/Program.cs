@@ -84,11 +84,11 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddHttpContextAccessor();
 #endregion
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(Int32.Parse(port)); // Listen on the port assigned by Heroku
-});
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.ListenAnyIP(Int32.Parse(port)); // Listen on the port assigned by Heroku
+//});
 
 var app = builder.Build();
 
