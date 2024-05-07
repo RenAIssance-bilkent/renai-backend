@@ -213,6 +213,33 @@ namespace MelodyMuseAPI.Controllers
             return Ok(trackRetrivals);
         }
 
+        // GET: api/t/g/{genre}
+        [HttpGet("g/{genre}")]
+        public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> GetTracksByGenre(string genre)
+        {
+            var tracks = await _trackService.GetTracksByGenre(genre);
+            if (!tracks.Any())
+            {
+                return NotFound($"No tracks found for genre {genre}.");
+            }
+
+            var trackRetrievals = tracks.Select(track => new TrackRetrivalDto
+            {
+                Id = track.Id,
+                UserId = track.UserId,
+                Title = track.Title,
+                Genre = track.Genre,
+                CreatedAt = track.CreatedAt,
+                Metadata = track.Metadata,
+                Model = track.Model,
+                AudioEndpoint = $"/api/t/media/audio/{track.AudioId}/",
+                ImageEndpoint = $"/api/t/media/image/{track.ImageId}/",
+            }).ToList();
+
+            return Ok(trackRetrievals);
+        }
+
+
         // DELETE: api/t/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrack(string id)

@@ -203,12 +203,20 @@ namespace MelodyMuseAPI.Services
 
         public async Task<Track> GetTrackByIdAsync(string trackId)
         {
-            return await _trackCollection.Find(t => t.Id == trackId).FirstOrDefaultAsync();
+            var filter = Builders<Track>.Filter.Eq(t => t.Id, trackId);
+            return await _trackCollection.Find(filter).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Track>> GetTracksByUserAsync(string userId)
         {
-            return await _trackCollection.Find(t => t.UserId == userId).ToListAsync();
+            var filter = Builders<Track>.Filter.Eq(t => t.UserId, userId);
+            return await _trackCollection.Find(filter).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Track>> GetTracksByGenreAsync(string genre)
+        {
+            var filter = Builders<Track>.Filter.Eq(t => t.Genre, genre); 
+            return await _trackCollection.Find(filter).ToListAsync();
         }
 
         public async Task<bool> DeleteTrackAsync(string trackId)
@@ -234,7 +242,6 @@ namespace MelodyMuseAPI.Services
         }
 
         #endregion
-
 
         #region Media Handling
 

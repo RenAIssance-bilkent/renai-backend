@@ -97,6 +97,11 @@ namespace MelodyMuseAPI.Services
             return await _mongoDbService.GetTracksByUserAsync(userId);
         }
 
+        public async Task<IEnumerable<Track>> GetTracksByGenre(string genre)
+        {
+            return await _mongoDbService.GetTracksByGenreAsync(genre);
+        }
+
         public async Task<bool> DeleteTrack(string trackId)
         {
             return await _mongoDbService.DeleteTrackAsync(trackId);
