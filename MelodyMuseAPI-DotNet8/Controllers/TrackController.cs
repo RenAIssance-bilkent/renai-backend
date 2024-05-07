@@ -215,6 +215,7 @@ namespace MelodyMuseAPI.Controllers
 
         // GET: api/t/g/{genre}
         [HttpGet("g/{genre}")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<TrackRetrivalDto>>> GetTracksByGenre(string genre)
         {
             var tracks = await _trackService.GetTracksByGenre(genre);
