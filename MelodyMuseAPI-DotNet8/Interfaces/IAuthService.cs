@@ -9,6 +9,6 @@ namespace MelodyMuseAPI.Interfaces
         Task<RegistrationResult> RegisterUser(UserRegistrationDto userRegistrationDto);
         Task<LoginResult> LoginUser(UserLoginDto userLoginDto);
         Task<bool> ConfirmEmailAsync(string token, string email);
-        Task<bool> ResetPassword(UserResetPasswordDto userResetPasswordDto);
+        Task<bool> ResetPassword(string email);
     }
 }

@@ -94,9 +94,45 @@ namespace MelodyMuseAPI.Services
             return result;
         }
 
-        public Task<bool> ResetPassword(UserResetPasswordDto userResetPasswordDto)
+        public async Task<bool> ResetPassword(string email)
         {
-            throw new NotImplementedException("Reset password feature is not implemented yet.");
+            string newPassword = GenerateRandomPassword();
+
+            var user = await _mongoDbService.GetUserByEmailAsync(email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            var updateResult = await _mongoDbService.UpdateUserPasswordAsync(user.Id, newPasswordHash);
+            if (!updateResult)
+            {
+                return false; // Password update failed
+            }
+
+            // Send an email with the new password
+            try
+            {
+                await _emailSenderService.SendResetPasswordEmail(user.Name, user.Email, newPassword);
+            }
+            catch (Exception ex)
+            {
+                // Log the error (or handle it according to your error handling policy)
+                Console.WriteLine($"Failed to send password reset email: {ex.Message}");
+                return false;
+            }
+
+            return true; // Success
+        }
+
+        private string GenerateRandomPassword(int length = 12)
+        {
+            const string validChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
+            Random random = new Random();
+            return new string(Enumerable.Repeat(validChars, length)
+                                        .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         private string CreateToken(UserDto user)

@@ -53,5 +53,25 @@ namespace MelodyMuseAPI.Controllers
                 return BadRequest("Incorrect token or identification.");
             }
         }
+
+        [HttpPost("rp")]
+        public async Task<IActionResult> ResetPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest("Email is required.");
+            }
+
+            var result = await _authService.ResetPassword(email);
+            if (result)
+            {
+                return Ok("A new password has been sent to your email.");
+            }
+            else
+            {
+                return BadRequest("Failed to reset password. Please check the email provided and try again.");
+            }
+        }
+
     }
 }

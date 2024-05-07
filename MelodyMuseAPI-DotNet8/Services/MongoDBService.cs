@@ -64,10 +64,10 @@ namespace MelodyMuseAPI.Services
             var result = await _userCollection.UpdateOneAsync(filter, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
-        public async Task<bool> UpdateUserPasswordAsync(string userId, string newPassword)
+        public async Task<bool> UpdateUserPasswordAsync(string userId, string newPasswordHash)
         {
             var filter = Builders<User>.Filter.Eq(user => user.Id, userId);
-            var update = Builders<User>.Update.Set(user => user.PasswordHash, BCrypt.Net.BCrypt.HashPassword(newPassword));
+            var update = Builders<User>.Update.Set(user => user.PasswordHash, newPasswordHash);
             var result = await _userCollection.UpdateOneAsync(filter, update);
 
             return result.ModifiedCount == 1;

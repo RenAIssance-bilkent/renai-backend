@@ -41,7 +41,7 @@ namespace MelodyMuseAPI.Services
         {
             var isValid = await _mongoDbService.ValidatePasswordHashByIdAsync(userId, userChangePasswordDto.CurrentPassword);
 
-            if (isValid)
+            if (isValid && userChangePasswordDto.NewPassword == userChangePasswordDto.ConfirmNewPassword)
             {
                 var newPasswordHash = BCrypt.Net.BCrypt.HashPassword(userChangePasswordDto.NewPassword);
                 return await _mongoDbService.UpdateUserPasswordAsync(userId, newPasswordHash);

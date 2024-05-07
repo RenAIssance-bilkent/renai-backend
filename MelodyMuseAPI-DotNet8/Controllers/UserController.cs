@@ -101,5 +101,33 @@ namespace MelodyMuseAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // POST: api/u/password
+        [HttpPost("password")]
+        public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordDto userChangePasswordDto)
+        {
+            var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Unauthorized Access.");
+            }
+
+            try
+            {
+                bool result = await _userService.ChangePassword(currentUserId, userChangePasswordDto);
+                if (result)
+                {
+                    return Ok("Password changed successfully.");
+                }
+                else
+                {
+                    return BadRequest("Password change failed. Please check the current password and try again.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
