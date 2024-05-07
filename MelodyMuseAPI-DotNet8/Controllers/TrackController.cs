@@ -79,7 +79,7 @@ namespace MelodyMuseAPI.Controllers
             }
 
             var trackId = await trackGenerationTask; // Wait for the track generation to complete
-            await Response.WriteAsync($"data: {{\"trackId\": \"{0}\", \"completion_percent\": 100}}\n\n");
+            await Response.WriteAsync($"data: {{\"trackId\": \"{trackId}\", \"completion_percent\": 100}}\n\n");
             await Response.Body.FlushAsync();
 
             Response.Body.Close();
