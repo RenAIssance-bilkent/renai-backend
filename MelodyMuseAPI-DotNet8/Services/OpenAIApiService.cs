@@ -25,9 +25,9 @@ public class OpenAIApiService
     public async Task<string> GenerateRandomPrompt(string userId)
     {
         var randomIndex = new Random().Next(_genres.Count);
-        return await GeneratePromptBasedOnGenre(_genres[randomIndex], userId);
+        return await GeneratePromptBasedOnGenre(userId, _genres[randomIndex]);
     }
-    public async Task<string> GeneratePromptBasedOnGenre(string userId, string genre)
+    public async Task<string> GeneratePromptBasedOnGenre(string genre, string userId)
     {
         var requestData = new
         {

@@ -38,6 +38,13 @@ namespace MelodyMuseAPI.Services
                 return new LoginResult { Success = false, Errors = new List<string> { "Invalid credentials provided." } };
             }
 
+            var isConfirmed = await _mongoDbService.IsConfirmedByEmailAsync(userLoginDto.Email);
+
+            if (!isConfirmed)
+            {
+                return new LoginResult { Success = false, Errors = new List<string> { "Email is not confirmed." } };
+            }
+
             var existingUser = await _mongoDbService.GetUserByEmailAsync(userLoginDto.Email);
 
             var userTokenDto = new UserTokenDto

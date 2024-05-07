@@ -149,6 +149,17 @@ namespace MelodyMuseAPI.Services
             return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
         }
 
+        public async Task<bool> IsConfirmedByEmailAsync(string userEmail)
+        {
+            var user = await _userCollection.Find(user => user.Email == userEmail)
+                                            .FirstOrDefaultAsync();
+
+            if (user == null)
+                return false;
+
+            return user.IsConfirmed;
+        }
+
         private UserDto ToDto(User user)
         {
             if (user == null) return null;
