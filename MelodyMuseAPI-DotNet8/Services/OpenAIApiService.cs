@@ -5,6 +5,9 @@ using MelodyMuseAPI.Settings;
 using MelodyMuseAPI.Models;
 using MelodyMuseAPI.Controllers;
 using MelodyMuseAPI.Dtos;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 public class OpenAIApiService
 {
@@ -167,7 +170,20 @@ public class OpenAIApiService
                         throw new HttpRequestException($"Failed to download image: {imageResponse.StatusCode}");
                     }
 
-                    return await imageResponse.Content.ReadAsStreamAsync();
+                    using (var imageStream = await imageResponse.Content.ReadAsStreamAsync())
+                    {
+                        using (var image = Image.Load(imageStream))
+                        {
+                            // Resize the image
+                            image.Mutate(x => x.Resize(256, 256));
+
+                            // Convert image to a Stream to return
+                            var outputStream = new MemoryStream();
+                            image.Save(outputStream, new PngEncoder());
+                            outputStream.Position = 0;
+                            return outputStream;
+                        }
+                    }
                 }
             }
         }

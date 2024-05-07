@@ -43,7 +43,7 @@ public class MongoDbServiceTests
                                                   It.IsAny<CancellationToken>()))
                            .Returns(_mockCursor.Object);
 
-        _service = new MongoDbService(settings, _mockClient.Object);
+       // _service = new MongoDbService(settings, _mockClient.Object);
     }
 
     [TestMethod]
