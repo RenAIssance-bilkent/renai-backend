@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text;
 using MongoDB.Bson;
+using System.IO;
 
 namespace MelodyMuseAPI.Services
 {

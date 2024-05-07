@@ -23,7 +23,8 @@ public class OpenAIApiService
     {
             "ORCHESTRAL",
             "POP",
-            "ROCK"
+            "ROCK",
+            "ELECTRONIC",
     };
     public async Task<string> GenerateRandomPrompt(string userId)
     {
