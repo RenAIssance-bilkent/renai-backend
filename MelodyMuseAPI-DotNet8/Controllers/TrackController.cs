@@ -75,7 +75,6 @@ namespace MelodyMuseAPI.Controllers
                 var logMessage = log.Message;
                 var jsonMessage = $"data: {{\"log\": \"{logMessage}\", \"completion_percent\": {log.CompletionPercent} }}\n\n";
                 await Response.WriteAsync(jsonMessage);
-                await Response.Body.FlushAsync();
             }
 
             var trackId = await trackGenerationTask; // Wait for the track generation to complete
